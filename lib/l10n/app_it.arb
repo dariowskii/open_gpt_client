@@ -1,0 +1,52 @@
+{
+    "settings": "Impostazioni",
+    "about": "Informazioni",
+    "send": "Invia",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "back": "Indietro",
+    "delete": "Cancella",
+    "model": "Modello",
+    "modifyChatTitle": "Modifica titolo",
+    "newTitle": "Nuovo titolo",
+    "deleteChatTitle": "Cancella chat",
+    "deleteChatQuestion": "Sei sicuro di voler cancellare questa chat?",
+    "dasboardFieldInput": "Chiedimi qualsiasi cosa!",
+    "copy": "Copia",
+    "copiedToClipboard": "Copiato negli appunti!",
+    "@dasboardFieldInput": {
+        "description": "Placeholder per l'input della dashboard"
+    },
+    "yourChats": "Le tue chat",
+    "@yourChats": {
+        "description": "Titolo della sidebar home"
+    },
+    "addChat": "Aggiungi chat",
+    "@addChat": {
+        "description": "Testo botton aggiungi nella sidebar home"
+    },
+    "noChatTitle": "Nessun titolo",
+    "@noChatTitle": {
+        "description": "Titolo di default di una nuova chat"
+    },
+    "noMessages": "Nessun messaggio.\nInizia una conversazione!",
+    "@noMessages": {
+        "description": "Feedback della chat vuota"
+    },
+    "sentFromYou": "Inviato da te",
+    "@sentFromYou": {
+        "description": "Titolo da mostrare nella card ChatMessageUI in caso di invio dall'utente"
+    },
+    "responseFromAI": "Risposta AI",
+    "@responseFromAI": {
+        "description": "Titolo da mostrare nella card ChatMessageUI in caso di risposta della AI"
+    },
+    "messagesInContext": "Messaggi nel contesto",
+    "@messagesInContext": {
+        "description": "Informativa su quanti messaggi sono caricati nel contesto della chat selezionata"
+    },
+    "inTheContext": "Nel contesto",
+    "@inTheContext": {
+        "description": "Flag utilizzato nella ChatMessageUI per indicare se un messaggio è inserito nel contesto"
+    }
+}

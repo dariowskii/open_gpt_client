@@ -1,0 +1,32 @@
+name: open_gpt_client
+description: An open-source client to connect with OpenAI API's.
+
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.19.2 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  
+  cupertino_icons: ^1.0.2
+  encrypt: ^5.0.1
+  markdown_widget: ^2.1.0
+  intl: any
+  http: ^0.13.5
+  shared_preferences: ^2.1.0
+  uuid: ^3.0.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.1
+
+flutter:
+  uses-material-design: true
+  generate: true
