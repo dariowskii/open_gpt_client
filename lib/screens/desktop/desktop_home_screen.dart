@@ -47,7 +47,7 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
                       children: [
                         Text('${appLocals.model}: '),
                         const Text(
-                          'gpt-3.5-turbo',
+                          'gpt-3.5-turbo-0301',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),

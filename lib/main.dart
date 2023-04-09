@@ -8,6 +8,7 @@ import 'package:open_gpt_client/utils/app_bloc.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await LocalData.instance.setUserKey('1234567890123456');
   final appState = await LocalData.instance.loadAppState();
 
   runApp(
