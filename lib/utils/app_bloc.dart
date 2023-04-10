@@ -107,10 +107,11 @@ class AppStateNotifier extends ValueNotifier<AppState> {
   }
 }
 
+// ignore: must_be_immutable
 class AppBloc extends InheritedWidget {
-  final AppStateNotifier appState;
+  AppStateNotifier appState;
 
-  const AppBloc({
+  AppBloc({
     super.key,
     required this.appState,
     required Widget child,

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
+import 'package:open_gpt_client/utils/exceptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalData {
@@ -42,7 +43,7 @@ class LocalData {
     }
 
     if (encrypted.base64 != encryptedTestPhrase) {
-      throw Exception('Wrong key');
+      throw WrongKeyException();
     }
 
     _iv = iv;
@@ -51,13 +52,15 @@ class LocalData {
 
   Future<void> saveSelectedChatId(String chatId) async {
     final prefs = await _prefs;
-    await prefs.setString('selectedChatId', _encrypter!.encrypt(chatId, iv: _iv!).base64);
+    await prefs.setString(
+        'selectedChatId', _encrypter!.encrypt(chatId, iv: _iv!).base64);
   }
 
   Future<void> saveAppState(AppState state) async {
     final prefs = await _prefs;
     final json = jsonEncode(state);
-    await prefs.setString('appState', _encrypter!.encrypt(json, iv: _iv!).base64);
+    await prefs.setString(
+        'appState', _encrypter!.encrypt(json, iv: _iv!).base64);
   }
 
   Future<AppState> loadAppState() async {

@@ -1,0 +1,1 @@
+class WrongKeyException implements Exception {}

@@ -3,6 +3,7 @@
     "about": "Informazioni",
     "send": "Invia",
     "save": "Salva",
+    "confirm": "Conferma",
     "cancel": "Annulla",
     "back": "Indietro",
     "delete": "Cancella",
@@ -14,6 +15,19 @@
     "dasboardFieldInput": "Chiedimi qualsiasi cosa!",
     "copy": "Copia",
     "copiedToClipboard": "Copiato negli appunti!",
+    "resetApp": "Resetta applicazione",
+    "resetAppConfirmation": "Sei sicuro di voler resettare i dati dell'applicazione?\nL'azione sarà irreversibile.",
+    "passwordCannotBeEmpty": "La passowd non può essere vuota!",
+    "errorPasswordLenght": "La password deve essere di 16, 24 o 32 caratteri!",
+    "wrongPassword": "Password errata! Riprova.",
+    "insertPasswordHint": "Inserisci la password per sbloccare l'applicazione.",
+    "@insertPasswordHint": {
+        "description": "Frase di suggerimento per la WelcomeLockScreen"
+    },
+    "unlock": "Sblocca",
+    "@unlock": {
+        "description": "Bottone di ingresso all'app"
+    },
     "@dasboardFieldInput": {
         "description": "Placeholder per l'input della dashboard"
     },

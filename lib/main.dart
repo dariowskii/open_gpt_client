@@ -3,18 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:open_gpt_client/screens/home_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:open_gpt_client/screens/welcome_lock_screen.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await LocalData.instance.setUserKey('1234567890123456');
-  final appState = await LocalData.instance.loadAppState();
-
+void main() {
   runApp(
     AppBloc(
       appState: AppStateNotifier(
-        state: appState,
+        state: AppState(chats: []),
       ),
       child: const MyApp(),
     ),
@@ -30,7 +26,7 @@ class MyApp extends StatelessWidget {
       title: 'Open GPT Client',
       debugShowCheckedModeBanner: kDebugMode,
       theme: ThemeData.dark(useMaterial3: true),
-      home: const HomeScreen(),
+      home: const WelcomeLockScreen(),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       localeListResolutionCallback: (locales, supportedLocales) {
