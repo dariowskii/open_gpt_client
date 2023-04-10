@@ -6,8 +6,6 @@ import 'package:open_gpt_client/utils/exceptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalData {
-  String userKey = '';
-
   IV? _iv;
   Encrypter? _encrypter;
 
@@ -19,6 +17,11 @@ class LocalData {
   LocalData._();
 
   Future<void> setUserKey(String key) async {
+    assert(
+      key.length == 16 || key.length == 24 || key.length == 32,
+      'Key length must be 16, 24 or 32',
+    );
+
     final prefs = await _prefs;
     const testPrhase = 'never gonna give you up';
     final encryptedTestPhrase = prefs.getString('encryptedTestPhrase');
@@ -51,12 +54,22 @@ class LocalData {
   }
 
   Future<void> saveSelectedChatId(String chatId) async {
+    assert(
+      _iv != null && _encrypter != null,
+      'Key not set',
+    );
+
     final prefs = await _prefs;
     await prefs.setString(
         'selectedChatId', _encrypter!.encrypt(chatId, iv: _iv!).base64);
   }
 
   Future<void> saveAppState(AppState state) async {
+    assert(
+      _iv != null && _encrypter != null,
+      'Key not set',
+    );
+
     final prefs = await _prefs;
     final json = jsonEncode(state);
     await prefs.setString(
@@ -64,6 +77,11 @@ class LocalData {
   }
 
   Future<AppState> loadAppState() async {
+    assert(
+      _iv != null && _encrypter != null,
+      'Key not set',
+    );
+
     final prefs = await _prefs;
     final json = prefs.getString('appState');
     if (json != null) {
@@ -74,12 +92,15 @@ class LocalData {
         state.selectedChatId = _encrypter!.decrypt64(selectedChatId, iv: _iv!);
       }
       return state;
-    } else {
-      return AppState(chats: []);
-    }
+    } 
+    
+    return AppState(chats: []);
   }
 
   Future<void> clear() async {
+    _iv = null;
+    _encrypter = null;
+
     final prefs = await _prefs;
     await prefs.clear();
   }
