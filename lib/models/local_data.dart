@@ -1,7 +1,7 @@
 import 'dart:convert';
-
 import 'package:encrypt/encrypt.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
+import 'package:open_gpt_client/utils/constants.dart';
 import 'package:open_gpt_client/utils/exceptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,14 +17,15 @@ class LocalData {
   LocalData._();
 
   Future<void> setUserKey(String key) async {
-    assert(
-      key.length == 16 || key.length == 24 || key.length == 32,
-      'Key length must be 16, 24 or 32',
-    );
+    final keyLength = key.length;
+    if (keyLength != 16 && keyLength != 24 && keyLength != 32) {
+      throw const KeyException(type: KeyExceptionType.wrongKeyLength);
+    }
 
     final prefs = await _prefs;
     const testPrhase = 'never gonna give you up';
-    final encryptedTestPhrase = prefs.getString('encryptedTestPhrase');
+    final encryptedTestPhrase =
+        prefs.getString(Constants.keys.encryptedTestPhrase);
 
     final iv = IV.fromLength(16);
     final encrypter = Encrypter(
@@ -36,8 +37,9 @@ class LocalData {
     final encrypted = encrypter.encrypt(testPrhase, iv: iv);
 
     if (encryptedTestPhrase == null) {
-      // primo setup
-      await prefs.setString('encryptedTestPhrase', encrypted.base64);
+      // first setup
+      await prefs.setString(
+          Constants.keys.encryptedTestPhrase, encrypted.base64);
 
       _iv = iv;
       _encrypter = encrypter;
@@ -46,7 +48,7 @@ class LocalData {
     }
 
     if (encrypted.base64 != encryptedTestPhrase) {
-      throw WrongKeyException();
+      throw const KeyException(type: KeyExceptionType.wrongKey);
     }
 
     _iv = iv;
@@ -56,48 +58,50 @@ class LocalData {
   Future<void> saveSelectedChatId(String chatId) async {
     assert(
       _iv != null && _encrypter != null,
-      'Key not set',
+      Constants.internalErrors.keyNotSetted,
     );
 
     final prefs = await _prefs;
     await prefs.setString(
-        'selectedChatId', _encrypter!.encrypt(chatId, iv: _iv!).base64);
+      Constants.keys.selectedChatId,
+      _encrypter!.encrypt(chatId, iv: _iv!).base64,
+    );
   }
 
   Future<void> saveAppState(AppState state) async {
     assert(
       _iv != null && _encrypter != null,
-      'Key not set',
+      Constants.internalErrors.keyNotSetted,
     );
 
     final prefs = await _prefs;
     final json = jsonEncode(state);
     await prefs.setString(
-        'appState', _encrypter!.encrypt(json, iv: _iv!).base64);
+        Constants.keys.appState, _encrypter!.encrypt(json, iv: _iv!).base64);
   }
 
   Future<AppState> loadAppState() async {
     assert(
       _iv != null && _encrypter != null,
-      'Key not set',
+      Constants.internalErrors.keyNotSetted,
     );
 
     final prefs = await _prefs;
-    final json = prefs.getString('appState');
+    final json = prefs.getString(Constants.keys.appState);
     if (json != null) {
       final decrypted = _encrypter!.decrypt64(json, iv: _iv!);
       final state = AppState.fromJson(jsonDecode(decrypted));
-      final selectedChatId = prefs.getString('selectedChatId');
+      final selectedChatId = prefs.getString(Constants.keys.selectedChatId);
       if (selectedChatId != null) {
         state.selectedChatId = _encrypter!.decrypt64(selectedChatId, iv: _iv!);
       }
       return state;
-    } 
-    
+    }
+
     return AppState(chats: []);
   }
 
-  Future<void> clear() async {
+  Future<void> reset() async {
     _iv = null;
     _encrypter = null;
 
