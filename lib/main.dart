@@ -1,24 +1,31 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:open_gpt_client/models/local_data.dart';
-import 'package:open_gpt_client/screens/home_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:open_gpt_client/screens/on_boarding_screen.dart';
 import 'package:open_gpt_client/screens/welcome_lock_screen.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final needSetup = await LocalData.instance.setupDone;
+  final home = needSetup == null || !needSetup ? const OnBoardingScreen() : const WelcomeLockScreen();
+
   runApp(
     AppBloc(
       appState: AppStateNotifier(
         state: AppState(chats: []),
       ),
-      child: const MyApp(),
+      child: MyApp(home: home),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.home,});
+
+  final Widget home;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +33,7 @@ class MyApp extends StatelessWidget {
       title: 'Open GPT Client',
       debugShowCheckedModeBanner: kDebugMode,
       theme: ThemeData.dark(useMaterial3: true),
-      home: const WelcomeLockScreen(),
+      home: home,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       localeListResolutionCallback: (locales, supportedLocales) {

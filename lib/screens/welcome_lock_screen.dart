@@ -35,15 +35,8 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
       setState(() {
         AppBloc.of(context).appState.value = appState;
       });
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) {
-            return const HomeScreen();
-          },
-        ),
-      );
+      
+      context.pushReplacement(const HomeScreen());
     } on KeyException catch (error) {
       final errorType = error.type;
       late final String errorMessage;

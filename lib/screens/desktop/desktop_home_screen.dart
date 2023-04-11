@@ -37,6 +37,9 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
           ),
           Expanded(
             child: Container(
+              constraints: const BoxConstraints(
+                minWidth: 400,
+              ),
               color: Theme.of(context).colorScheme.surface,
               child: Column(
                 children: [

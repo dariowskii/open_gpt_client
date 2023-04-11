@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:open_gpt_client/extensions/context_extension.dart';
 import 'package:open_gpt_client/models/chat.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
@@ -74,7 +75,7 @@ class SidebarHome extends StatelessWidget {
                                   actions: [
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(context).pop();
+                                        context.pop();
                                       },
                                       child: Text(
                                         appLocals.cancel,
@@ -90,7 +91,7 @@ class SidebarHome extends StatelessWidget {
                                             chat, textController.text);
                                         LocalData.instance
                                             .saveAppState(appState.value);
-                                        Navigator.of(context).pop();
+                                        context.pop();
                                       },
                                       child: Text(appLocals.save),
                                     ),
@@ -114,7 +115,7 @@ class SidebarHome extends StatelessWidget {
                                   actions: [
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(context).pop();
+                                        context.pop();
                                       },
                                       child: Text(appLocals.back),
                                     ),
@@ -124,7 +125,7 @@ class SidebarHome extends StatelessWidget {
                                         appState.deleteChat(chat);
                                         LocalData.instance
                                             .saveAppState(appState.value);
-                                        Navigator.of(context).pop();
+                                        context.pop();
                                       },
                                       child: Text(
                                         appLocals.delete,
