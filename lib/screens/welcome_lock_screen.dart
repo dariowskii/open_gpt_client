@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:open_gpt_client/screens/home_screen.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
+import 'package:open_gpt_client/utils/exceptions.dart';
 
 class WelcomeLockScreen extends StatefulWidget {
   const WelcomeLockScreen({super.key});
@@ -12,8 +13,8 @@ class WelcomeLockScreen extends StatefulWidget {
 }
 
 class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
-  var _isPasswordVisible = false;
-  final _textController = TextEditingController();
+  late var _isPasswordVisible = false;
+  late final _textController = TextEditingController();
 
   void _tryUnlock(AppLocalizations appLocals) async {
     final password = _textController.text.trim();
@@ -21,17 +22,6 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(appLocals.passwordCannotBeEmpty),
-        ),
-      );
-      return;
-    }
-
-    final passwordLength = password.length;
-
-    if (passwordLength != 16 && passwordLength != 24 && passwordLength != 32) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(appLocals.errorPasswordLenght),
         ),
       );
       return;
@@ -57,10 +47,28 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
           },
         ),
       );
-    } catch (e) {
+    } on KeyException catch (error) {
+      final errorType = error.type;
+      late final String errorMessage;
+
+      switch (errorType) {
+        case KeyExceptionType.wrongKey:
+          errorMessage = appLocals.wrongPassword;
+          break;
+        case KeyExceptionType.wrongKeyLength:
+          errorMessage = appLocals.errorPasswordLenght;
+          break;
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(appLocals.wrongPassword),
+          content: Text(errorMessage),
+        ),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.toString()),
         ),
       );
     }
@@ -141,7 +149,7 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
                           ),
                           TextButton(
                             onPressed: () async {
-                              await LocalData.instance.clear();
+                              await LocalData.instance.reset();
                               // TODO: rimandare alla schermata di tutorial
                             },
                             child: Text(
