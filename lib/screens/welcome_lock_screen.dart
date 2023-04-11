@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:open_gpt_client/extensions/context_extension.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:open_gpt_client/screens/home_screen.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
@@ -19,11 +20,7 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
   void _tryUnlock(AppLocalizations appLocals) async {
     final password = _textController.text.trim();
     if (password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(appLocals.passwordCannotBeEmpty),
-        ),
-      );
+      context.showSnackBar(appLocals.passwordCannotBeEmpty);
       return;
     }
 
@@ -60,17 +57,9 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
           break;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-        ),
-      );
+      context.showSnackBar(errorMessage);
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.toString()),
-        ),
-      );
+      context.showSnackBar(error.toString());
     }
   }
 

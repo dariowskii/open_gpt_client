@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:markdown_widget/markdown_widget.dart';
+import 'package:open_gpt_client/extensions/context_extension.dart';
 import 'package:open_gpt_client/models/chat.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:open_gpt_client/models/local_data.dart';
@@ -158,11 +159,7 @@ class ChatMessageUIState extends State<ChatMessageUI> {
                       Clipboard.setData(
                         ClipboardData(text: widget.message.content),
                       );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(appLocals.copiedToClipboard),
-                        ),
-                      );
+                      context.showSnackBar(appLocals.copiedToClipboard);
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(

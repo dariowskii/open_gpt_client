@@ -9,4 +9,12 @@ extension ContextExtension on BuildContext {
   }
 
   bool get isDesktop => MediaQuery.of(this).size.width >= 1200;
+
+  void showSnackBar(String message) {
+    ScaffoldMessenger.of(this).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
 }
