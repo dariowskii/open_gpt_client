@@ -16,6 +16,16 @@ class LocalData {
 
   LocalData._();
 
+  Future<bool?> get setupDone async {
+    final prefs = await _prefs;
+    return prefs.getBool(Constants.keys.setupDone);
+  }
+
+  Future<void> setSetupDone() async {
+    final prefs = await _prefs;
+    await prefs.setBool(Constants.keys.setupDone, true);
+  }
+
   Future<void> setUserKey(String key) async {
     final keyLength = key.length;
     if (keyLength != 16 && keyLength != 24 && keyLength != 32) {
