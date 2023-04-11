@@ -16,9 +16,10 @@ dependencies:
   
   cupertino_icons: ^1.0.2
   encrypt: ^5.0.1
-  markdown_widget: ^2.1.0
-  intl: any
   http: ^0.13.5
+  intl: any
+  markdown_widget: ^2.1.0
+  password_strength_checker: ^1.2.2
   shared_preferences: ^2.1.0
   smooth_page_indicator: ^1.0.1
   uuid: ^3.0.7
