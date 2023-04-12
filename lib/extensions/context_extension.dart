@@ -19,6 +19,9 @@ extension ContextExtension on BuildContext {
   }
   bool get isDesktop => MediaQuery.of(this).size.width >= 1200;
 
+  double get width => MediaQuery.of(this).size.width;
+  double get height => MediaQuery.of(this).size.height;
+
   // Navigator
 
   void push(Widget widget) {
