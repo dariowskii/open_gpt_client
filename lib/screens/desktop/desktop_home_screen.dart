@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:open_gpt_client/extensions/context_extension.dart';
 import 'package:open_gpt_client/models/chat.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:open_gpt_client/screens/desktop/sidebar_home.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
 import 'package:open_gpt_client/widgets/chat_message_ui.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 class DesktopHomeScreen extends StatefulWidget {
@@ -17,6 +19,86 @@ class DesktopHomeScreen extends StatefulWidget {
 class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
   final _textController = TextEditingController();
   final _fieldFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+
+    LocalData.instance.hasAPIKey.then((hasKey) {
+      if (hasKey) {
+        return;
+      }
+
+      askApiKey();
+    });
+  }
+
+  void askApiKey() {
+    final apiKeyController = TextEditingController();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Imposta chiave API'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Per poter utilizzare il servizio è necessario inserire una chiave API di OpenAI valida.',
+              ),
+              const Text(
+                'Se non ne hai una, puoi richiederla qui:',
+              ),
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () async {
+                    final uri = Uri.parse(
+                        'https://platform.openai.com/account/api-keys');
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri);
+                    }
+                  },
+                  child: const Text(
+                    'https://platform.openai.com/account/api-keys',
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: apiKeyController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Chiave API',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                if (apiKeyController.text.isEmpty) {
+                  return;
+                }
+                await LocalData.instance.setAPIKey(apiKeyController.text);
+                if (!mounted) {
+                  return;
+                }
+
+                context.pop();
+              },
+              child: const Text('Ok'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +119,6 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
           ),
           Expanded(
             child: Container(
-              constraints: const BoxConstraints(
-                minWidth: 400,
-              ),
               color: Theme.of(context).colorScheme.surface,
               child: Column(
                 children: [
@@ -84,7 +163,7 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
                         );
                       }
                       final selectedChat = state.selectedChat!;
-
+          
                       if (selectedChat.messages.isEmpty) {
                         return Expanded(
                           child: Center(
@@ -95,10 +174,10 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
                           ),
                         );
                       }
-
+          
                       final reversedList =
                           selectedChat.messages.reversed.toList();
-
+          
                       return Expanded(
                         child: ListView.separated(
                           addAutomaticKeepAlives: false,
@@ -154,10 +233,10 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
                                         content: trimmedText,
                                       );
                                       appState.addToSelectedAndContext(message);
-
+          
                                       LocalData.instance
                                           .saveAppState(currentState);
-
+          
                                       _textController.clear();
                                       _fieldFocusNode.unfocus();
                                       appState.addMessageToSelectedChat(
@@ -165,19 +244,18 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
                                           id: const Uuid().v4(),
                                           uniqueKeyUI:
                                               GlobalKey<ChatMessageUIState>(),
-                                          senderRole:
-                                              MessageSenderRole.assistant,
+                                          senderRole: MessageSenderRole.assistant,
                                           content: '',
                                           isLoadingResponse: true,
                                         ),
                                       );
-
-                                      final response = await apiService
-                                          .sendMessages(
+          
+                                      final response =
+                                          await apiService.sendMessages(
                                               currentState.selectedChat!);
                                       if (response != null) {
-                                        appState.attachStreamToLastResponse(
-                                            response);
+                                        appState
+                                            .attachStreamToLastResponse(response);
                                       }
                                     }
                                   },
