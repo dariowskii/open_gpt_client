@@ -6,6 +6,7 @@ class Constants {
 class Keys {
   const Keys();
 
+  String get apiKey => 'apiKey';
   String get setupDone => 'setupDone';
   String get encryptedTestPhrase => 'encryptedTestPhrase';
   String get selectedChatId => 'selectedChatId';

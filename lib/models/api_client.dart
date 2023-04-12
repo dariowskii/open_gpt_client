@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:open_gpt_client/models/chat.dart';
+import 'package:open_gpt_client/models/local_data.dart';
 
 abstract class ApiService {
   Future<Stream<String>?> sendMessages(Chat chat);
@@ -20,7 +21,7 @@ class ApiClient implements ApiService {
           .postUrl(Uri.parse('https://api.openai.com/v1/chat/completions'));
       request.headers.set('content-type', 'application/json;charset=UTF-8');
       request.headers.set('Authorization',
-          'Bearer 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');
+          'Bearer ${(await LocalData.instance.apiKey)!}');
       final messages = chat.contextMessagesJson();
       request.add(
         utf8.encode(

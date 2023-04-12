@@ -21,6 +21,25 @@ class LocalData {
     return prefs.getBool(Constants.keys.setupDone);
   }
 
+  Future<bool> get hasAPIKey async {
+    final prefs = await _prefs;
+    final apiKey = prefs.getString(Constants.keys.apiKey);
+    return apiKey != null && apiKey.isNotEmpty;
+  }
+
+  Future<String?> get apiKey async {
+    assert(
+      _iv != null && _encrypter != null,
+      Constants.internalErrors.keyNotSetted,
+    );
+
+    final prefs = await _prefs;
+    return _encrypter!.decrypt64(
+      prefs.getString(Constants.keys.apiKey)!,
+      iv: _iv!,
+    );
+  }
+
   Future<void> setSetupDone() async {
     final prefs = await _prefs;
     await prefs.setBool(Constants.keys.setupDone, true);
@@ -63,6 +82,19 @@ class LocalData {
 
     _iv = iv;
     _encrypter = encrypter;
+  }
+
+  Future<void> setAPIKey(String apiKey) async {
+    assert(
+      _iv != null && _encrypter != null,
+      Constants.internalErrors.keyNotSetted,
+    );
+
+    final prefs = await _prefs;
+    await prefs.setString(
+      Constants.keys.apiKey,
+      _encrypter!.encrypt(apiKey, iv: _iv!).base64,
+    );
   }
 
   Future<void> saveSelectedChatId(String chatId) async {
