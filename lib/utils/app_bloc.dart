@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:open_gpt_client/models/api_client.dart';
 import 'package:open_gpt_client/models/chat.dart';
 
 class AppState {
@@ -110,10 +111,12 @@ class AppStateNotifier extends ValueNotifier<AppState> {
 // ignore: must_be_immutable
 class AppBloc extends InheritedWidget {
   AppStateNotifier appState;
+  ApiService apiService;
 
   AppBloc({
     super.key,
     required this.appState,
+    required this.apiService,
     required Widget child,
   }) : super(child: child);
 

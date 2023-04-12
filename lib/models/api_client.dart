@@ -5,7 +5,14 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:open_gpt_client/models/chat.dart';
 
-class ApiClient {
+abstract class ApiService {
+  Future<Stream<String>?> sendMessages(Chat chat);
+  Future<bool?> checkUpdate();
+}
+
+class ApiClient implements ApiService {
+
+  @override
   Future<Stream<String>?> sendMessages(Chat chat) async {
     try {
       final httpClient = HttpClient();
@@ -57,5 +64,10 @@ class ApiClient {
       debugPrint(e.toString());
       return null;
     }
+  }
+
+  @override
+  Future<bool?> checkUpdate() async {
+    // TODO: implement checkUpdate
   }
 }

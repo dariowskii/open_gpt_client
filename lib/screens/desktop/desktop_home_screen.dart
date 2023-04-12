@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:open_gpt_client/models/api_client.dart';
 import 'package:open_gpt_client/models/chat.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:open_gpt_client/screens/desktop/sidebar_home.dart';
@@ -22,6 +21,7 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final appState = AppBloc.of(context).appState;
+    final apiService = AppBloc.of(context).apiService;
     final appLocals = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -172,7 +172,7 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
                                         ),
                                       );
 
-                                      final response = await ApiClient()
+                                      final response = await apiService
                                           .sendMessages(
                                               currentState.selectedChat!);
                                       if (response != null) {
