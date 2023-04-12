@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:open_gpt_client/models/api_client.dart';
@@ -6,12 +8,24 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:open_gpt_client/screens/on_boarding_screen.dart';
 import 'package:open_gpt_client/screens/welcome_lock_screen.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
+import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final needSetup = await LocalData.instance.setupDone;
-  final home = needSetup == null || !needSetup ? const OnBoardingScreen() : const WelcomeLockScreen();
+  final home = needSetup == null || !needSetup
+      ? const OnBoardingScreen()
+      : const WelcomeLockScreen();
+
+  if (!Platform.isAndroid || !Platform.isIOS) {
+    await windowManager.ensureInitialized();
+
+    WindowManager.instance.setTitle('Open GPT Client');
+    WindowManager.instance.setMinimumSize(const Size(900, 600));
+    WindowManager.instance.setMaximumSize(Size.infinite);
+    WindowManager.instance.setResizable(true);
+  }
 
   runApp(
     AppBloc(
@@ -25,7 +39,10 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, required this.home,});
+  const MyApp({
+    super.key,
+    required this.home,
+  });
 
   final Widget home;
 
