@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:open_gpt_client/extensions/context_extension.dart';
+import 'package:open_gpt_client/models/api_client.dart';
 import 'package:open_gpt_client/models/chat.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:open_gpt_client/screens/desktop/sidebar_home.dart';
@@ -20,6 +21,8 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
   final _textController = TextEditingController();
   final _fieldFocusNode = FocusNode();
 
+  var _updateAvailable = false;
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +33,16 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
       }
 
       askApiKey();
+    });
+
+    ApiClient().checkUpdate().then((updateAvailable) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _updateAvailable = updateAvailable == true;
+      });
     });
   }
 
@@ -110,6 +123,30 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
       appBar: AppBar(
         title: const Text('Chat'),
         elevation: 5,
+        actions: [
+          if (_updateAvailable)
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: ElevatedButton(
+              onPressed: () async {
+                final uri = Uri.parse(
+                    'https://github.com/dariowskii/open_gpt_client/releases/latest');
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri);
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+              ),
+              child: Text(
+                'Aggiornamento disponibile!',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Row(
         children: [
@@ -163,7 +200,7 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
                         );
                       }
                       final selectedChat = state.selectedChat!;
-          
+
                       if (selectedChat.messages.isEmpty) {
                         return Expanded(
                           child: Center(
@@ -174,10 +211,10 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
                           ),
                         );
                       }
-          
+
                       final reversedList =
                           selectedChat.messages.reversed.toList();
-          
+
                       return Expanded(
                         child: ListView.separated(
                           addAutomaticKeepAlives: false,
@@ -233,10 +270,10 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
                                         content: trimmedText,
                                       );
                                       appState.addToSelectedAndContext(message);
-          
+
                                       LocalData.instance
                                           .saveAppState(currentState);
-          
+
                                       _textController.clear();
                                       _fieldFocusNode.unfocus();
                                       appState.addMessageToSelectedChat(
@@ -244,18 +281,19 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
                                           id: const Uuid().v4(),
                                           uniqueKeyUI:
                                               GlobalKey<ChatMessageUIState>(),
-                                          senderRole: MessageSenderRole.assistant,
+                                          senderRole:
+                                              MessageSenderRole.assistant,
                                           content: '',
                                           isLoadingResponse: true,
                                         ),
                                       );
-          
+
                                       final response =
                                           await apiService.sendMessages(
                                               currentState.selectedChat!);
                                       if (response != null) {
-                                        appState
-                                            .attachStreamToLastResponse(response);
+                                        appState.attachStreamToLastResponse(
+                                            response);
                                       }
                                     }
                                   },

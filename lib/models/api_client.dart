@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:open_gpt_client/models/chat.dart';
 import 'package:open_gpt_client/models/local_data.dart';
+import 'package:http/http.dart' as http;
 
 abstract class ApiService {
   Future<Stream<String>?> sendMessages(Chat chat);
@@ -12,7 +13,6 @@ abstract class ApiService {
 }
 
 class ApiClient implements ApiService {
-
   @override
   Future<Stream<String>?> sendMessages(Chat chat) async {
     try {
@@ -20,8 +20,8 @@ class ApiClient implements ApiService {
       final request = await httpClient
           .postUrl(Uri.parse('https://api.openai.com/v1/chat/completions'));
       request.headers.set('content-type', 'application/json;charset=UTF-8');
-      request.headers.set('Authorization',
-          'Bearer ${(await LocalData.instance.apiKey)!}');
+      request.headers
+          .set('Authorization', 'Bearer ${(await LocalData.instance.apiKey)!}');
       final messages = chat.contextMessagesJson();
       request.add(
         utf8.encode(
@@ -69,6 +69,29 @@ class ApiClient implements ApiService {
 
   @override
   Future<bool?> checkUpdate() async {
-    // TODO: implement checkUpdate
+    try {
+      final response = await http.get(
+        Uri.parse(
+          'https://api.github.com/repos/dariowskii/open_gpt_client/releases/latest',
+        ),
+        headers: {
+          'Accept': 'application/vnd.github+json',
+          'Authorization':
+              'Bearer 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',
+          'X-GitHub-Api-Version': '2022-11-28',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        return false;
+      }
+
+      final json = jsonDecode(response.body);
+      final version = (json['tag_name'] as String).replaceFirst('v', '');
+      return version != '1.0.0';
+    } catch (e) {
+      debugPrint(e.toString());
+      return null;
+    }
   }
 }
