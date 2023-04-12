@@ -22,6 +22,7 @@ void main() async {
     await windowManager.ensureInitialized();
 
     WindowManager.instance.setTitle('Open GPT Client');
+    WindowManager.instance.setSize(const Size(900, 600));
     WindowManager.instance.setMinimumSize(const Size(900, 600));
     WindowManager.instance.setMaximumSize(Size.infinite);
     WindowManager.instance.setResizable(true);

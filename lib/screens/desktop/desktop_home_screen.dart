@@ -41,7 +41,7 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
       }
 
       setState(() {
-        _updateAvailable = updateAvailable == true;
+        _updateAvailable = updateAvailable;
       });
     });
   }

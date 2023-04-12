@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:encrypt/encrypt.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
 import 'package:open_gpt_client/utils/constants.dart';
 import 'package:open_gpt_client/utils/exceptions.dart';
@@ -14,7 +15,9 @@ class LocalData {
 
   late final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
-  LocalData._();
+  LocalData._() {
+    dotenv.load();
+  }
 
   Future<bool?> get setupDone async {
     final prefs = await _prefs;
@@ -38,6 +41,10 @@ class LocalData {
       prefs.getString(Constants.keys.apiKey)!,
       iv: _iv!,
     );
+  }
+
+  String? get ghKey {
+    return dotenv.env[Constants.keys.ghKey];
   }
 
   Future<void> setSetupDone() async {

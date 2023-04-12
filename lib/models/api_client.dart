@@ -68,7 +68,7 @@ class ApiClient implements ApiService {
   }
 
   @override
-  Future<bool?> checkUpdate() async {
+  Future<bool> checkUpdate() async {
     try {
       final response = await http.get(
         Uri.parse(
@@ -77,7 +77,7 @@ class ApiClient implements ApiService {
         headers: {
           'Accept': 'application/vnd.github+json',
           'Authorization':
-              'Bearer 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',
+              'Bearer ${LocalData.instance.ghKey!}',
           'X-GitHub-Api-Version': '2022-11-28',
         },
       );
@@ -91,7 +91,7 @@ class ApiClient implements ApiService {
       return version != '1.0.0';
     } catch (e) {
       debugPrint(e.toString());
-      return null;
+      return false;
     }
   }
 }
