@@ -43,6 +43,15 @@ class LocalData {
     );
   }
 
+  Future<String?> get reducedApiKey async {
+    final key = await apiKey;
+    if (key == null) {
+      return null;
+    }
+
+    return '${key.substring(0, 2)}-...${key.substring(key.length - 4, key.length)}';
+  }
+
   String? get ghKey {
     return dotenv.env[Constants.keys.ghKey];
   }

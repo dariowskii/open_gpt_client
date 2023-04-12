@@ -40,7 +40,7 @@ extension ContextExtension on BuildContext {
     );
   }
 
-  void pop() {
+  void pop<T>([T? result]) {
     Navigator.of(this).pop();
   }
 

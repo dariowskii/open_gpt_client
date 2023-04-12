@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:open_gpt_client/extensions/context_extension.dart';
 import 'package:open_gpt_client/models/chat.dart';
 import 'package:open_gpt_client/models/local_data.dart';
+import 'package:open_gpt_client/screens/settings_screen.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
 import 'package:uuid/uuid.dart';
 
@@ -192,7 +193,9 @@ class SidebarHome extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.settings),
           title: Text(appLocals.settings),
-          onTap: () {},
+          onTap: () {
+            context.push(const SettingsScreen());
+          },
         ),
         ListTile(
           leading: const Icon(Icons.info),

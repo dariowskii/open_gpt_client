@@ -114,7 +114,8 @@ class ChatMessageUIState extends State<ChatMessageUI> {
               const Spacer(),
               Row(
                 children: [
-                  TextButton(
+                  IconButton(
+                    tooltip: appLocals.delete,
                     onPressed: () {
                       AppBloc.of(context)
                           .appState
@@ -123,72 +124,27 @@ class ChatMessageUIState extends State<ChatMessageUI> {
                         AppBloc.of(context).appState.value,
                       );
                     },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color.fromARGB(137, 255, 33, 33),
-                      ),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.delete,
-                          size: 15,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          appLocals.delete,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+                    icon: const Icon(
+                      Icons.delete,
+                      size: 20,
+                      color: Color(0xffFF5C5C),
                     ),
                   ),
                   const SizedBox(
                     width: 8,
                   ),
-                  TextButton(
+                  IconButton(
+                    tooltip: appLocals.copy,
                     onPressed: () {
                       Clipboard.setData(
                         ClipboardData(text: widget.message.content),
                       );
                       context.showSnackBar(appLocals.copiedToClipboard);
                     },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        Colors.white10,
-                      ),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.copy,
-                          size: 15,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          appLocals.copy,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+                    icon: const Icon(
+                      Icons.copy,
+                      size: 17,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(
