@@ -76,8 +76,7 @@ class ApiClient implements ApiService {
         ),
         headers: {
           'Accept': 'application/vnd.github+json',
-          'Authorization':
-              'Bearer ${LocalData.instance.ghKey!}',
+          'Authorization': 'Bearer ${LocalData.instance.ghKey!}',
           'X-GitHub-Api-Version': '2022-11-28',
         },
       );
@@ -88,7 +87,7 @@ class ApiClient implements ApiService {
 
       final json = jsonDecode(response.body);
       final version = (json['tag_name'] as String).replaceFirst('v', '');
-      return version != '1.0.0';
+      return version != '0.0.1';
     } catch (e) {
       debugPrint(e.toString());
       return false;
