@@ -85,9 +85,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          TextSpan(
-                              text:
-                                  '\nI dati non vengono mai inviati a server remoti.'),
+                          TextSpan(text: '\nI dati non vengono mai inviati a server remoti.'),
                         ],
                       ),
                       textAlign: TextAlign.center,
@@ -104,7 +102,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       height: min(300, context.height * 0.4),
                     ),
                     const SizedBox(height: 24),
-                    Text(
+                    const Text(
                       'Economico',
                       style: TextStyle(
                         fontSize: 24,
@@ -112,7 +110,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text(
+                    const Text(
                       'Il software è completamente gratuito e non richiede alcun abbonamento.\nUtilizzando le API di OpenAI pagherai solo per ciò che effettivamente consumi!',
                       textAlign: TextAlign.center,
                     ),

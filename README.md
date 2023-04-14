@@ -1,16 +1,15 @@
-# open_gpt_client
+# Open GPT Client
 
-A new Flutter project.
+Questo è un client open source per poter utilizzare le API di **OpenAI**, in primis con il modello **GPT-3.5** per usare la chat.
 
-## Getting Started
+## Come funziona
 
-This project is a starting point for a Flutter application.
+Per utilizzare il client è necessario essere in possesso di una chiave API di OpenAI.
+Per ottenere una chiave API è necessario creare un account [qui](https://platform.openai.com/account/api-keys).
 
-A few resources to get you started if this is your first Flutter project:
+## Privacy
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Il client non salva alcuna informazione riguardante l'utente, né la chiave API, né il testo scritto.
+I dati salvati in locale vengono criptati con algorito **AES-256-CTR**.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Made with ❤️ by [**Dario Varriale**](https://www.linkedin.com/in/dario-varriale/)
