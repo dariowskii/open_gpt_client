@@ -12,6 +12,6 @@ Per ottenere una chiave API è necessario creare un account [qui](https://platfo
 
 Il client non salva alcuna informazione riguardante l'utente, né la chiave API, né il testo scritto.
 
-I dati salvati in locale vengono criptati con algorito **AES-256-CTR**.
+I dati salvati in locale vengono criptati con algoritmo **AES-256-CTR**.
 
 Made with ❤️ by [**Dario Varriale**](https://www.linkedin.com/in/dario-varriale/)

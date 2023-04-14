@@ -55,7 +55,7 @@ class ChatMessageUIState extends State<ChatMessageUI> {
       _isInError = true;
       widget.message.isLoadingResponse = false;
       widget.message.content =
-          'Errore nel recuperare la risposta.\n\nCause possibili:\n- Connesione internet assente\n- Chiave API (OpenAI) errata\n- Non hai ancora configurato il piano a pagamento di OpenAI\n- Le API di OpenAI sono momentaneamente offline\n\nRiprova più tardi.';
+          'Errore nel recuperare la risposta.\n\nCause possibili:\n- Connessione internet assente\n- Chiave API (OpenAI) errata\n- Non hai ancora configurato il piano a pagamento di OpenAI\n- Le API di OpenAI sono momentaneamente offline\n\nRiprova più tardi.';
     });
   }
 
