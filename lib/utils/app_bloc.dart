@@ -79,6 +79,11 @@ class AppStateNotifier extends ValueNotifier<AppState> {
         ?.attachStream(stream);
   }
 
+  void setErrorToLastMessage() {
+    value.selectedChat?.messages.last.uniqueKeyUI?.currentState
+        ?.setErrorStatus();
+  }
+
   void addMessageToContext(ChatMessage message) {
     value.selectedChat?.contextMessages.add(message);
     notifyListeners();

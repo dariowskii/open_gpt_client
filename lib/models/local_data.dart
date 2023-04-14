@@ -48,8 +48,12 @@ class LocalData {
     if (key == null) {
       return null;
     }
+    final length = key.length;
+    if (length < 8) {
+      return key;
+    }
 
-    return '${key.substring(0, 2)}-...${key.substring(key.length - 4, key.length)}';
+    return '${key.substring(0, 2)}-...${key.substring(length - 4, length)}';
   }
 
   String? get ghKey {

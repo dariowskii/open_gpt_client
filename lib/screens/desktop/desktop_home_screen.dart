@@ -122,30 +122,31 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat'),
+        centerTitle: true,
         elevation: 5,
         actions: [
           if (_updateAvailable)
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: ElevatedButton(
-              onPressed: () async {
-                final uri = Uri.parse(
-                    'https://github.com/dariowskii/open_gpt_client/releases/latest');
-                if (await canLaunchUrl(uri)) {
-                  await launchUrl(uri);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-              ),
-              child: Text(
-                'Aggiornamento disponibile!',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSecondary,
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: ElevatedButton(
+                onPressed: () async {
+                  final uri = Uri.parse(
+                      'https://github.com/dariowskii/open_gpt_client/releases/latest');
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                ),
+                child: Text(
+                  'Aggiornamento disponibile!',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
       body: Row(
@@ -294,7 +295,10 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
                                       if (response != null) {
                                         appState.attachStreamToLastResponse(
                                             response);
+                                        return;
                                       }
+
+                                      appState.setErrorToLastMessage();
                                     }
                                   },
                                   child: Row(

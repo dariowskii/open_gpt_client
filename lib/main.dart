@@ -8,7 +8,15 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:open_gpt_client/screens/on_boarding_screen.dart';
 import 'package:open_gpt_client/screens/welcome_lock_screen.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
-import 'package:window_manager/window_manager.dart';
+import 'package:window_size/window_size.dart';
+
+Future<void> _desktopSetup() async {
+  if (!Platform.isAndroid || !Platform.isIOS) {
+    setWindowTitle('Open GPT Client');
+    setWindowMinSize(const Size(1000, 700));
+    setWindowMaxSize(Size.infinite);
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,15 +26,7 @@ void main() async {
       ? const OnBoardingScreen()
       : const WelcomeLockScreen();
 
-  if (!Platform.isAndroid || !Platform.isIOS) {
-    await windowManager.ensureInitialized();
-
-    WindowManager.instance.setTitle('Open GPT Client');
-    WindowManager.instance.setSize(const Size(900, 600));
-    WindowManager.instance.setMinimumSize(const Size(900, 600));
-    WindowManager.instance.setMaximumSize(Size.infinite);
-    WindowManager.instance.setResizable(true);
-  }
+  await _desktopSetup();
 
   runApp(
     AppBloc(

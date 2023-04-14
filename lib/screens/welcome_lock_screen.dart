@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:open_gpt_client/extensions/context_extension.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:open_gpt_client/screens/home_screen.dart';
+import 'package:open_gpt_client/screens/on_boarding_screen.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
 import 'package:open_gpt_client/utils/exceptions.dart';
 
@@ -35,7 +36,7 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
       setState(() {
         AppBloc.of(context).appState.value = appState;
       });
-      
+
       context.pushReplacement(const HomeScreen());
     } on KeyException catch (error) {
       final errorType = error.type;
@@ -132,7 +133,11 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
                           TextButton(
                             onPressed: () async {
                               await LocalData.instance.reset();
-                              // TODO: rimandare alla schermata di tutorial
+                              if (!mounted) {
+                                return;
+                              }
+
+                              context.pushReplacement(const OnBoardingScreen());
                             },
                             child: Text(
                               appLocals.confirm,

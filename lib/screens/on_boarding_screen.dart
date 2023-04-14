@@ -36,7 +36,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       height: min(300, context.height * 0.4),
                     ),
                     const SizedBox(height: 24),
-                    Text(
+                    const Text(
                       'Open Source',
                       style: TextStyle(
                         fontSize: 24,
@@ -44,7 +44,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text(
+                    const Text(
                       'Questo software è open source, visionabile e\npuoi contribuire al suo sviluppo su GitHub.',
                       textAlign: TextAlign.center,
                     ),
@@ -60,7 +60,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       height: min(300, context.height * 0.4),
                     ),
                     const SizedBox(height: 24),
-                    Text(
+                    const Text(
                       'Sicuro',
                       style: TextStyle(
                         fontSize: 24,
@@ -68,8 +68,28 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      'Tutti i dati vengono salvati in modo sicuro e\nnon vengono mai inviati a server remoti.',
+                    const Text.rich(
+                      TextSpan(
+                        text: 'Tutti i dati vengono salvati\nin modo sicuro ',
+                        children: [
+                          TextSpan(
+                            text: 'solo sul tuo dispositivo',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextSpan(text: ', con algoritmo '),
+                          TextSpan(
+                            text: 'AES-256.',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextSpan(
+                              text:
+                                  '\nI dati non vengono mai inviati a server remoti.'),
+                        ],
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const Spacer(),

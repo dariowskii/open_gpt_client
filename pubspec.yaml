@@ -26,7 +26,10 @@ dependencies:
   smooth_page_indicator: ^1.0.1
   url_launcher: ^6.1.10
   uuid: ^3.0.7
-  window_manager: ^0.3.2
+  window_size:
+    git:
+      url: https://github.com/google/flutter-desktop-embedding
+      path: plugins/window_size
 
 dev_dependencies:
   flutter_test:

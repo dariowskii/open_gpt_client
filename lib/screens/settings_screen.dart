@@ -84,9 +84,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           border: OutlineInputBorder(),
                                           labelText: 'Chiave API',
                                         ),
-                                        onSubmitted: (value) {
-                                          context.pop(value);
-                                        },
                                       ),
                                       actions: [
                                         TextButton(
@@ -105,6 +102,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             }
                                             await LocalData.instance
                                                 .setAPIKey(textController.text);
+
+                                            if (!mounted) {
+                                              return;
+                                            }
+
                                             context.pop();
                                             context.showSnackBar(
                                               'Chiave API modificata!',

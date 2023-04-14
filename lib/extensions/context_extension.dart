@@ -3,7 +3,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
 
 extension ContextExtension on BuildContext {
-
   // Blocs
 
   AppLocalizations get appLocals => AppLocalizations.of(this)!;
@@ -17,6 +16,7 @@ extension ContextExtension on BuildContext {
     final width = MediaQuery.of(this).size.width;
     return width >= 600 && width < 1200;
   }
+
   bool get isDesktop => MediaQuery.of(this).size.width >= 1200;
 
   double get width => MediaQuery.of(this).size.width;

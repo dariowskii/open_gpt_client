@@ -29,6 +29,7 @@ class ChatMessageUI extends StatefulWidget {
 
 class ChatMessageUIState extends State<ChatMessageUI> {
   StreamSubscription<String>? _subscription;
+  var _isInError = false;
 
   void attachStream(Stream<String> stream) {
     _subscription = stream.listen((event) {
@@ -49,6 +50,15 @@ class ChatMessageUIState extends State<ChatMessageUI> {
     });
   }
 
+  void setErrorStatus() {
+    setState(() {
+      _isInError = true;
+      widget.message.isLoadingResponse = false;
+      widget.message.content =
+          'Errore nel recuperare la risposta.\n\nCause possibili:\n- Connesione internet assente\n- Chiave API (OpenAI) errata\n- Non hai ancora configurato il piano a pagamento di OpenAI\n- Le API di OpenAI sono momentaneamente offline\n\nRiprova più tardi.';
+    });
+  }
+
   @override
   void dispose() {
     _subscription?.cancel();
@@ -57,9 +67,11 @@ class ChatMessageUIState extends State<ChatMessageUI> {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = widget.message.fromMe
-        ? Theme.of(context).colorScheme.surfaceVariant
-        : Theme.of(context).colorScheme.primaryContainer;
+    final backgroundColor = _isInError
+        ? const Color.fromARGB(255, 173, 40, 22)
+        : widget.message.fromMe
+            ? Theme.of(context).colorScheme.surfaceVariant
+            : Theme.of(context).colorScheme.primaryContainer;
     final appLocals = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
@@ -124,10 +136,11 @@ class ChatMessageUIState extends State<ChatMessageUI> {
                         AppBloc.of(context).appState.value,
                       );
                     },
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.delete,
                       size: 20,
-                      color: Color(0xffFF5C5C),
+                      color:
+                          _isInError ? Colors.white : const Color(0xffFF5C5C),
                     ),
                   ),
                   const SizedBox(
@@ -158,8 +171,12 @@ class ChatMessageUIState extends State<ChatMessageUI> {
                     ),
                   ),
                   Checkbox(
-                    value: widget.messageIsInContext,
+                    value: _isInError ? false : widget.messageIsInContext,
                     onChanged: (value) {
+                      if (_isInError) {
+                        return;
+                      }
+
                       final appState = AppBloc.of(context).appState;
                       if (value!) {
                         appState.addMessageToContext(widget.message);
