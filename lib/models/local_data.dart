@@ -7,6 +7,8 @@ import 'package:open_gpt_client/utils/exceptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalData {
+  //#region VARIABLES
+
   IV? _iv;
   Encrypter? _encrypter;
 
@@ -15,9 +17,17 @@ class LocalData {
 
   late final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
+  //#endregion
+
+  //#region CORE
+
   LocalData._() {
     dotenv.load();
   }
+
+  //#endregion
+
+  //#region GETTERS
 
   Future<bool?> get setupDone async {
     final prefs = await _prefs;
@@ -60,35 +70,26 @@ class LocalData {
     return dotenv.env[Constants.keys.ghKey];
   }
 
+  //#endregion
+
+  //#region SETTERS
+
   Future<void> setSetupDone() async {
     final prefs = await _prefs;
     await prefs.setBool(Constants.keys.setupDone, true);
   }
 
   Future<void> setUserKey(String key) async {
-    final keyLength = key.length;
-    if (keyLength != 16 && keyLength != 24 && keyLength != 32) {
-      throw const KeyException(type: KeyExceptionType.wrongKeyLength);
-    }
+    final encrypter = _generateEncrypter(key);
+    final iv = _generateIV();
 
     final prefs = await _prefs;
-    const testPrhase = 'never gonna give you up';
-    final encryptedTestPhrase =
-        prefs.getString(Constants.keys.encryptedTestPhrase);
+    final memoryPhrase = prefs.getString(Constants.keys.encryptedTestPhrase);
+    final encryptedPhrase = encrypter.encrypt('never gonna give you up', iv: iv);
 
-    final iv = IV.fromLength(16);
-    final encrypter = Encrypter(
-      AES(
-        Key.fromUtf8(key),
-        mode: AESMode.ctr,
-      ),
-    );
-    final encrypted = encrypter.encrypt(testPrhase, iv: iv);
-
-    if (encryptedTestPhrase == null) {
+    if (memoryPhrase == null) {
       // first setup
-      await prefs.setString(
-          Constants.keys.encryptedTestPhrase, encrypted.base64);
+      await prefs.setString(Constants.keys.encryptedTestPhrase, encryptedPhrase.base64);
 
       _iv = iv;
       _encrypter = encrypter;
@@ -96,7 +97,7 @@ class LocalData {
       return;
     }
 
-    if (encrypted.base64 != encryptedTestPhrase) {
+    if (encryptedPhrase.base64 != memoryPhrase) {
       throw const KeyException(type: KeyExceptionType.wrongKey);
     }
 
@@ -138,9 +139,12 @@ class LocalData {
 
     final prefs = await _prefs;
     final json = jsonEncode(state);
-    await prefs.setString(
-        Constants.keys.appState, _encrypter!.encrypt(json, iv: _iv!).base64);
+    await prefs.setString(Constants.keys.appState, _encrypter!.encrypt(json, iv: _iv!).base64);
   }
+
+  //#endregion
+
+  //#region PUBLIC
 
   Future<AppState> loadAppState() async {
     assert(
@@ -170,4 +174,26 @@ class LocalData {
     final prefs = await _prefs;
     await prefs.clear();
   }
+
+  //#endregion
+
+  //#region PRIVATE
+
+  IV _generateIV() => IV.fromLength(16);
+
+  Encrypter _generateEncrypter(String key) {
+    final keyLength = key.length;
+    if (keyLength != 16 && keyLength != 24 && keyLength != 32) {
+      throw const KeyException(type: KeyExceptionType.wrongKeyLength);
+    }
+
+    return Encrypter(
+      AES(
+        Key.fromUtf8(key),
+        mode: AESMode.ctr,
+      ),
+    );
+  }
+
+  //#endregion
 }
