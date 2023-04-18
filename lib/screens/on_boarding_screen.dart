@@ -81,7 +81,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     ElevatedButton(
                       onPressed: _currentPageIndex == _pages.length - 1
                           ? () {
-                              context.pushAndRemoveUntil(PasswordSetupScreen());
+                              context.pushAndRemoveUntil(const PasswordSetupScreen());
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
