@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:open_gpt_client/extensions/context_extension.dart';
@@ -28,7 +30,7 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
     super.dispose();
   }
 
-  void _generatePasswordAndCopy(BuildContext context) {
+  void _generatePasswordAndCopy() {
     const config = PasswordGeneratorConfiguration(
       length: 32,
       minLowercase: 8,
@@ -37,7 +39,10 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
       minSpecial: 8,
     );
     final passGenerator = PasswordGenerator.fromConfig(configuration: config);
-    final pass = passGenerator.generate();
+    var pass = '';
+    while (utf8.encode(pass).length != 32) {
+      pass = passGenerator.generate();
+    }
     _passwordTextController.text = pass;
     _confirmTextController.text = pass;
     _passwordStrengthNotifier.value = PasswordStrength.calculate(text: pass);
@@ -136,7 +141,7 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        onPressed: () => _generatePasswordAndCopy(context),
+                        onPressed: _generatePasswordAndCopy,
                         child: Text(appLocals.generatePassword),
                       ),
                     ),
