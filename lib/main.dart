@@ -10,7 +10,7 @@ import 'package:open_gpt_client/screens/welcome_lock_screen.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
 import 'package:window_size/window_size.dart';
 
-Future<void> _desktopSetup() async {
+void _desktopSetup() {
   if (!Platform.isAndroid || !Platform.isIOS) {
     setWindowTitle('Open GPT Client');
     setWindowMinSize(const Size(1000, 700));
@@ -26,7 +26,7 @@ void main() async {
       ? const OnBoardingScreen()
       : const WelcomeLockScreen();
 
-  await _desktopSetup();
+  _desktopSetup();
 
   runApp(
     AppBloc(

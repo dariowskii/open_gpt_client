@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:open_gpt_client/extensions/context_extension.dart';
@@ -5,15 +7,29 @@ import 'package:open_gpt_client/models/local_data.dart';
 import 'package:open_gpt_client/screens/home_screen.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class PasswordSetupScreen extends StatelessWidget {
-  PasswordSetupScreen({Key? key}) : super(key: key);
+class PasswordSetupScreen extends StatefulWidget {
+  const PasswordSetupScreen({Key? key}) : super(key: key);
 
+  @override
+  State<PasswordSetupScreen> createState() => _PasswordSetupScreenState();
+}
+
+class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
   late final _passwordStrengthNotifier =
       ValueNotifier<PasswordStrengthItem?>(null);
   late final _passwordTextController = TextEditingController();
   late final _confirmTextController = TextEditingController();
   late final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _passwordTextController.dispose();
+    _confirmTextController.dispose();
+    _passwordStrengthNotifier.dispose();
+    super.dispose();
+  }
 
   void _generatePasswordAndCopy(BuildContext context) {
     const config = PasswordGeneratorConfiguration(
@@ -33,8 +49,28 @@ class PasswordSetupScreen extends StatelessWidget {
     context.showSnackBar(context.appLocals.copiedToClipboard);
   }
 
-  void _savePasswordAndContinue(BuildContext context) async {
-    context.pop();
+  void _askConfirmForPassword(AppLocalizations appLocals) {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(appLocals.saveYourPasswordTitle),
+        content: Text(appLocals.saveYourPasswordText),
+        actions: [
+          TextButton(
+            onPressed: () => _savePasswordAndContinue(dialogContext),
+            child: Text(appLocals.forward),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _savePasswordAndContinue(BuildContext dialogContext) async {
+    dialogContext.pop();
 
     final password = _passwordTextController.text.trim();
     final confirm = _confirmTextController.text.trim();
@@ -47,10 +83,14 @@ class PasswordSetupScreen extends StatelessWidget {
     await LocalData.instance.setSetupDone();
     final appState = await LocalData.instance.loadAppState();
 
-    if (context.mounted) {
-      AppBloc.of(context).appState.value = appState;
-      context.pushReplacement(const HomeScreen());
+    if (!mounted) {
+      return;
     }
+
+    setState(() {
+      context.appState.value = appState;
+    });
+    context.pushAndRemoveUntil(const HomeScreen());
   }
 
   @override
@@ -61,28 +101,7 @@ class PasswordSetupScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Text(
-                  'Setup Password',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(width: 10),
-                Icon(
-                  Icons.lock,
-                )
-              ],
-            ),
-            const SizedBox(height: 32),
-            Text(
-              appLocals.setupPasswordHeadline,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
+            const _Header(),
             Container(
               constraints: const BoxConstraints(
                 maxWidth: 400,
@@ -92,45 +111,14 @@ class PasswordSetupScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    TextFormField(
+                    _PasswordTextField(
                       controller: _passwordTextController,
-                      decoration: const InputDecoration(
-                        labelText: 'Password',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return appLocals.passwordCannotBeEmpty;
-                        }
-                        final length = value.trim().length;
-                        if (length != 16 && length != 24 && length != 32) {
-                          return appLocals.errorPasswordLenght;
-                        }
-
-                        return null;
-                      },
-                      onChanged: (value) {
-                        _passwordStrengthNotifier.value =
-                            PasswordStrength.calculate(text: value);
-                      },
+                      passwordStrengthNotifier: _passwordStrengthNotifier,
                     ),
                     const SizedBox(height: 10),
-                    TextFormField(
+                    _ConfirmTextField(
                       controller: _confirmTextController,
-                      decoration: InputDecoration(
-                        labelText: appLocals.confirmPassword,
-                        border: const OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return appLocals.pleaseConfirmPassword;
-                        }
-                        if (value != _passwordTextController.text) {
-                          return appLocals.passwordDoesntMatchError;
-                        }
-
-                        return null;
-                      },
+                      passwordTextController: _passwordTextController,
                     ),
                     const SizedBox(height: 10),
                     PasswordStrengthChecker(
@@ -167,26 +155,7 @@ class PasswordSetupScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        onPressed: () {
-                          if (!_formKey.currentState!.validate()) {
-                            return;
-                          }
-
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: Text(appLocals.saveYourPasswordTitle),
-                              content: Text(appLocals.saveYourPasswordText),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      _savePasswordAndContinue(context),
-                                  child: Text(appLocals.forward),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                        onPressed: () => _askConfirmForPassword(appLocals),
                         child: Text(
                           appLocals.confirm,
                           style: TextStyle(
@@ -202,6 +171,113 @@ class PasswordSetupScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  const _Header({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final appLocals = context.appLocals;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Text(
+              'Setup Password',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(width: 10),
+            Icon(
+              Icons.lock,
+            )
+          ],
+        ),
+        const SizedBox(height: 32),
+        Text(
+          appLocals.setupPasswordHeadline,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+}
+
+class _PasswordTextField extends StatelessWidget {
+  const _PasswordTextField({
+    Key? key,
+    required this.controller,
+    required this.passwordStrengthNotifier,
+  }) : super(key: key);
+
+  final TextEditingController controller;
+  final ValueNotifier<PasswordStrengthItem?> passwordStrengthNotifier;
+
+  @override
+  Widget build(BuildContext context) {
+    final appLocals = context.appLocals;
+    return TextFormField(
+      controller: controller,
+      decoration: const InputDecoration(
+        labelText: 'Password',
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return appLocals.passwordCannotBeEmpty;
+        }
+        final length = value.trim().length;
+        if (length != 16 && length != 24 && length != 32) {
+          return appLocals.errorPasswordLenght;
+        }
+
+        return null;
+      },
+      onChanged: (value) {
+        passwordStrengthNotifier.value =
+            PasswordStrength.calculate(text: value);
+      },
+    );
+  }
+}
+
+class _ConfirmTextField extends StatelessWidget {
+  const _ConfirmTextField({
+    Key? key,
+    required this.controller,
+    required this.passwordTextController,
+  }) : super(key: key);
+
+  final TextEditingController controller;
+  final TextEditingController passwordTextController;
+
+  @override
+  Widget build(BuildContext context) {
+    final appLocals = context.appLocals;
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: appLocals.confirmPassword,
+        border: const OutlineInputBorder(),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return appLocals.pleaseConfirmPassword;
+        }
+        if (value != passwordTextController.text) {
+          return appLocals.passwordDoesntMatchError;
+        }
+
+        return null;
+      },
     );
   }
 }

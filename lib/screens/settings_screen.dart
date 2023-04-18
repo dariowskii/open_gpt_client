@@ -11,6 +11,61 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  void _showApiKeyDialog(String apiKey) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final textController = TextEditingController(
+          text: apiKey,
+        );
+        return AlertDialog(
+          title: const Text('Modifica chiave API'),
+          content: TextField(
+            controller: textController,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Chiave API',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text('Annulla'),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (textController.text.isEmpty ||
+                    textController.text == apiKey) {
+                  context.pop();
+                  return;
+                }
+                await LocalData.instance.setAPIKey(textController.text);
+
+                if (!mounted) {
+                  return;
+                }
+
+                context.pop();
+                context.showSnackBar(
+                  'Chiave API modificata!',
+                );
+                setState(() {});
+              },
+              child: const Text(
+                'Salva',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,12 +79,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             FutureBuilder(
               future: LocalData.instance.reducedApiKey,
-              builder: (context, value) {
-                if (!value.hasData) {
+              builder: (context, apiKeySnapshot) {
+                if (!apiKeySnapshot.hasData) {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
+
+                final apiKey = apiKeySnapshot.data!;
 
                 return Card(
                   child: Padding(
@@ -48,7 +105,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text(value.data!),
+                            Text(apiKey),
                           ],
                         ),
                         Row(
@@ -58,7 +115,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               icon: const Icon(Icons.copy),
                               onPressed: () {
                                 Clipboard.setData(
-                                  ClipboardData(text: value.data),
+                                  ClipboardData(text: apiKey),
                                 );
                                 context.showSnackBar(
                                   'Chiave API copiata negli appunti',
@@ -68,63 +125,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             IconButton(
                               tooltip: 'Modifica',
                               icon: const Icon(Icons.edit),
-                              onPressed: () async {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    final textController =
-                                        TextEditingController(
-                                      text: value.data,
-                                    );
-                                    return AlertDialog(
-                                      title: const Text('Modifica chiave API'),
-                                      content: TextField(
-                                        controller: textController,
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(),
-                                          labelText: 'Chiave API',
-                                        ),
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            context.pop();
-                                          },
-                                          child: const Text('Annulla'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () async {
-                                            if (textController.text.isEmpty ||
-                                                textController.text ==
-                                                    value.data) {
-                                              context.pop();
-                                              return;
-                                            }
-                                            await LocalData.instance
-                                                .setAPIKey(textController.text);
-
-                                            if (!mounted) {
-                                              return;
-                                            }
-
-                                            context.pop();
-                                            context.showSnackBar(
-                                              'Chiave API modificata!',
-                                            );
-                                            setState(() {});
-                                          },
-                                          child: const Text(
-                                            'Salva',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
+                              onPressed: () => _showApiKeyDialog(apiKey),
                             ),
                           ],
                         ),

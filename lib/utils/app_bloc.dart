@@ -116,7 +116,7 @@ class AppStateNotifier extends ValueNotifier<AppState> {
 // ignore: must_be_immutable
 class AppBloc extends InheritedWidget {
   AppStateNotifier appState;
-  ApiService apiService;
+  final ApiService apiService;
 
   AppBloc({
     super.key,

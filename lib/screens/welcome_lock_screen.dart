@@ -4,7 +4,6 @@ import 'package:open_gpt_client/extensions/context_extension.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:open_gpt_client/screens/home_screen.dart';
 import 'package:open_gpt_client/screens/on_boarding_screen.dart';
-import 'package:open_gpt_client/utils/app_bloc.dart';
 import 'package:open_gpt_client/utils/exceptions.dart';
 
 class WelcomeLockScreen extends StatefulWidget {
@@ -18,7 +17,8 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
   late var _isPasswordVisible = false;
   late final _textController = TextEditingController();
 
-  void _tryUnlock(AppLocalizations appLocals) async {
+  void _tryUnlock() async {
+    final appLocals = context.appLocals;
     final password = _textController.text.trim();
     if (password.isEmpty) {
       context.showSnackBar(appLocals.passwordCannotBeEmpty);
@@ -33,11 +33,8 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
         return;
       }
 
-      setState(() {
-        AppBloc.of(context).appState.value = appState;
-      });
-
-      context.pushReplacement(const HomeScreen());
+      context.appState.value = appState;
+      context.pushAndRemoveUntil(const HomeScreen());
     } on KeyException catch (error) {
       final errorType = error.type;
       late final String errorMessage;
@@ -84,7 +81,7 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
               TextField(
                 controller: _textController,
                 obscureText: !_isPasswordVisible,
-                onSubmitted: (_) => _tryUnlock(appLocals),
+                onSubmitted: (_) => _tryUnlock(),
                 decoration: InputDecoration(
                     border: const OutlineInputBorder(),
                     labelText: 'Password',
@@ -101,7 +98,7 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () => _tryUnlock(appLocals),
+                onPressed: () => _tryUnlock(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                 ),
@@ -137,7 +134,8 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
                                 return;
                               }
 
-                              context.pushReplacement(const OnBoardingScreen());
+                              context
+                                  .pushAndRemoveUntil(const OnBoardingScreen());
                             },
                             child: Text(
                               appLocals.confirm,

@@ -8,6 +8,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (context.isMobile) {
+      // TODO: implement mobile layout
       return const Placeholder();
     } else {
       return const DesktopHomeScreen();

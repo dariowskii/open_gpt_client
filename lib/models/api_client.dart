@@ -7,11 +7,17 @@ import 'package:open_gpt_client/models/chat.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:http/http.dart' as http;
 
+/// The [ApiService] interface defines the contract for the [ApiClient].
 abstract class ApiService {
+
+  /// The [sendMessages] method sends the messages of the selected [chat] to the OpenAI API.
   Future<Stream<String>?> sendMessages(Chat chat);
+
+  /// The [checkUpdate] method checks if there is an update of the app.
   Future<bool?> checkUpdate();
 }
 
+/// The [ApiClient] class defines the client of the OpenAI API.
 class ApiClient implements ApiService {
   @override
   Future<Stream<String>?> sendMessages(Chat chat) async {
