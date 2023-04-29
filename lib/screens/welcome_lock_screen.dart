@@ -6,6 +6,7 @@ import 'package:open_gpt_client/screens/home_screen.dart';
 import 'package:open_gpt_client/screens/on_boarding_screen.dart';
 import 'package:open_gpt_client/utils/exceptions.dart';
 
+/// The welcome lock screen.
 class WelcomeLockScreen extends StatefulWidget {
   const WelcomeLockScreen({super.key});
 
@@ -16,6 +17,12 @@ class WelcomeLockScreen extends StatefulWidget {
 class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
   late var _isPasswordVisible = false;
   late final _textController = TextEditingController();
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
 
   void _tryUnlock() async {
     final appLocals = context.appLocals;

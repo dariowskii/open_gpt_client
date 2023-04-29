@@ -6,6 +6,7 @@ import 'package:open_gpt_client/extensions/context_extension.dart';
 import 'package:open_gpt_client/screens/password_setup_screen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+/// The on boarding screen.
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
 

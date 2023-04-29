@@ -5,6 +5,7 @@ import 'package:open_gpt_client/screens/settings_screen.dart';
 import 'package:open_gpt_client/widgets/add_chat_button.dart';
 import 'package:open_gpt_client/widgets/sidebar_chat_item.dart';
 
+/// The home sidebar for desktop.
 class SidebarHome extends StatelessWidget {
   const SidebarHome({super.key});
 

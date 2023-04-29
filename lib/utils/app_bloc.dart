@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:open_gpt_client/models/api_client.dart';
 import 'package:open_gpt_client/models/chat.dart';
 
+/// 
 class AppState {
   final List<Chat> chats;
   String? selectedChatId;
@@ -18,16 +19,12 @@ class AppState {
     this.selectedChatId,
   });
 
-  // toJson
-
   Map<String, dynamic> toJson() {
     return {
       'chats': chats.map((e) => e.toJson()).toList(),
       'selectedChatId': selectedChatId,
     };
   }
-
-  // fromJson
 
   factory AppState.fromJson(Map<String, dynamic> json) {
     return AppState(
@@ -39,6 +36,8 @@ class AppState {
   }
 }
 
+/// The [AppStateNotifier] holds the state of the app and notifies 
+/// the listeners when the state changes.
 class AppStateNotifier extends ValueNotifier<AppState> {
   AppStateNotifier({required AppState state}) : super(state);
 
@@ -113,6 +112,8 @@ class AppStateNotifier extends ValueNotifier<AppState> {
   }
 }
 
+/// The [AppBloc] is an [InheritedWidget] that holds the [AppStateNotifier]
+/// and the [ApiService] instances.
 // ignore: must_be_immutable
 class AppBloc extends InheritedWidget {
   AppStateNotifier appState;

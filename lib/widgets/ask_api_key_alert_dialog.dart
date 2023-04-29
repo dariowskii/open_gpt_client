@@ -3,10 +3,21 @@ import 'package:open_gpt_client/extensions/context_extension.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class AskAPIKeyAlertDialog extends StatelessWidget {
-  AskAPIKeyAlertDialog({super.key});
+class AskAPIKeyAlertDialog extends StatefulWidget {
+  const AskAPIKeyAlertDialog({super.key});
 
+  @override
+  State<AskAPIKeyAlertDialog> createState() => _AskAPIKeyAlertDialogState();
+}
+
+class _AskAPIKeyAlertDialogState extends State<AskAPIKeyAlertDialog> {
   final controller = TextEditingController();
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

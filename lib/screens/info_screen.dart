@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:open_gpt_client/widgets/support_me_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// The info screen.
 class InfoScreen extends StatelessWidget {
   const InfoScreen({super.key});
 

@@ -93,6 +93,7 @@ class ApiClient implements ApiService {
 
       final json = jsonDecode(response.body);
       final version = (json['tag_name'] as String).replaceFirst('v', '');
+      // TODO: Change this to the current version of the app.
       return version != '0.0.1';
     } catch (e) {
       debugPrint(e.toString());

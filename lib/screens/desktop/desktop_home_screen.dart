@@ -46,7 +46,7 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => AskAPIKeyAlertDialog(),
+      builder: (_) => const AskAPIKeyAlertDialog(),
     );
   }
 

@@ -1,8 +1,10 @@
+/// Constants used in the app.
 class Constants {
   static Keys keys = const Keys();
   static InternalErrors internalErrors = const InternalErrors();
 }
 
+/// The [Keys] class holds the keys used in the app.
 class Keys {
   const Keys();
 
@@ -14,6 +16,7 @@ class Keys {
   String get appState => 'appState';
 }
 
+/// The [InternalErrors] class holds the internal errors strings.
 class InternalErrors {
   const InternalErrors();
 

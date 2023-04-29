@@ -8,6 +8,7 @@ import 'package:open_gpt_client/screens/home_screen.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// The password setup screen.
 class PasswordSetupScreen extends StatefulWidget {
   const PasswordSetupScreen({Key? key}) : super(key: key);
 
@@ -38,11 +39,13 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
       minDigits: 8,
       minSpecial: 8,
     );
+
     final passGenerator = PasswordGenerator.fromConfig(configuration: config);
     var pass = '';
-    while (utf8.encode(pass).length != 32) {
+    do {
       pass = passGenerator.generate();
-    }
+    } while (utf8.encode(pass).length != 32);
+
     _passwordTextController.text = pass;
     _confirmTextController.text = pass;
     _passwordStrengthNotifier.value = PasswordStrength.calculate(text: pass);
@@ -63,7 +66,10 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
         content: Text(appLocals.saveYourPasswordText),
         actions: [
           TextButton(
-            onPressed: () => _savePasswordAndContinue(dialogContext),
+            onPressed: () {
+              dialogContext.pop();
+              _savePasswordAndContinue();
+            },
             child: Text(appLocals.forward),
           ),
         ],
@@ -71,9 +77,7 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
     );
   }
 
-  void _savePasswordAndContinue(BuildContext dialogContext) async {
-    dialogContext.pop();
-
+  void _savePasswordAndContinue() async {
     final password = _passwordTextController.text.trim();
     final confirm = _confirmTextController.text.trim();
 
