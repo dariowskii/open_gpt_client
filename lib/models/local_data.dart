@@ -236,7 +236,7 @@ class LocalData {
     await compute(concurrentDeleteAllData, await _documentsPath);
   }
 
-  Future<void> migrateFromPrefsToConcurrentIfNecessary() async {
+  Future<AppState?> migrateFromPrefsToConcurrentIfNecessary() async {
     assert(
       _iv != null && _encrypter != null,
       Constants.internalErrors.keyNotSetted,
@@ -244,23 +244,25 @@ class LocalData {
 
     final prefs = await _prefs;
     final needMigration = prefs.getBool(Constants.keys.needMigration) ?? true;
-    final setupDone = prefs.getBool(Constants.keys.setupDone) ?? false;
-    if (!needMigration || !setupDone) {
-      return;
+
+    if (!needMigration) {
+      return null;
     }
 
     final appState = prefs.getString(Constants.keys.appState);
     if (appState == null || appState.isEmpty) {
-      return;
+      await prefs.setBool(Constants.keys.needMigration, false);
+      return null;
     }
 
     final apiKey = prefs.getString(Constants.keys.apiKey);
     final selectedChatId = prefs.getString(Constants.keys.selectedChatId);
+    final setupDone = prefs.getBool(Constants.keys.setupDone) ?? false;
 
     await prefs.clear();
 
     await prefs.setBool(Constants.keys.needMigration, false);
-    await prefs.setBool(Constants.keys.setupDone, true);
+    await prefs.setBool(Constants.keys.setupDone, setupDone);
 
     final args = {
       'encrypter': _encrypter,
@@ -272,6 +274,7 @@ class LocalData {
     };
 
     await compute(concurrentMigrateFromPrefs, args);
+    return loadAppState();
   }
 
   /// Generates a random IV.

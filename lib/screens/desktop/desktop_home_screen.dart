@@ -25,39 +25,49 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-       showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (ctx) {
-          return AlertDialog(
-            content: Row(
-              children: const [
-                CircularProgressIndicator(),
-                SizedBox(width: 8),
-                Text('Sto inizializzando...'),
-              ],
-            ),
-          );
-        },
-      );
-      LocalData.instance.migrateFromPrefsToConcurrentIfNecessary().then((_) {
-        context.pop();
+      _init();
+    });
+  }
 
-        if (!LocalData.instance.hasAPIKey) {
-        askApiKey();
-      }
-
-      ApiClient().checkUpdate().then((updateAvailable) {
-        if (!mounted) {
-          return;
-        }
-
-        setState(() {
-          _updateAvailable = updateAvailable;
-        });
+  void _init() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return AlertDialog(
+          content: Row(
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(width: 8),
+              Text('Sto inizializzando...'),
+            ],
+          ),
+        );
+      },
+    );
+    final newAppState =
+        await LocalData.instance.migrateFromPrefsToConcurrentIfNecessary();
+    if (newAppState != null) {
+      setState(() {
+        context.appState.value = newAppState;
       });
-      });
-      
+    }
+    if (!mounted) {
+      return;
+    }
+    context.pop();
+
+    if (!LocalData.instance.hasAPIKey) {
+      askApiKey();
+    }
+
+    final updateAvailable = await ApiClient().checkUpdate();
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _updateAvailable = updateAvailable;
     });
   }
 
