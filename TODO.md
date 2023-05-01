@@ -1,6 +1,6 @@
 # TODO
 
 - [x] Refactor code
-- [ ] Add documentation
+- [x] Add documentation
 - [ ] Finish internationalization
 - [ ] Mobile layout

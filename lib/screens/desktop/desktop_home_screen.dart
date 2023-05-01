@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:open_gpt_client/extensions/context_extension.dart';
 import 'package:open_gpt_client/models/api_client.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:open_gpt_client/screens/desktop/sidebar_home.dart';
@@ -23,22 +24,40 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
   void initState() {
     super.initState();
 
-    LocalData.instance.hasAPIKey.then((hasKey) {
-      if (hasKey) {
-        return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+       showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) {
+          return AlertDialog(
+            content: Row(
+              children: const [
+                CircularProgressIndicator(),
+                SizedBox(width: 8),
+                Text('Sto inizializzando...'),
+              ],
+            ),
+          );
+        },
+      );
+      LocalData.instance.migrateFromPrefsToConcurrentIfNecessary().then((_) {
+        context.pop();
+
+        if (!LocalData.instance.hasAPIKey) {
+        askApiKey();
       }
 
-      askApiKey();
-    });
+      ApiClient().checkUpdate().then((updateAvailable) {
+        if (!mounted) {
+          return;
+        }
 
-    ApiClient().checkUpdate().then((updateAvailable) {
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _updateAvailable = updateAvailable;
+        setState(() {
+          _updateAvailable = updateAvailable;
+        });
       });
+      });
+      
     });
   }
 

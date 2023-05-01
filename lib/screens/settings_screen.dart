@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:open_gpt_client/extensions/context_extension.dart';
+import 'package:open_gpt_client/models/app_settings.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 
 /// The settings screen.
@@ -135,7 +136,63 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 );
               },
-            )
+            ),
+            const SizedBox(height: 16),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Generazione Immagini (DALL•E)',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Genera immagini a partire da una descrizione utilizzando i servizi di DALL•E.',
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            const Text('Dimensione immagine: '),
+                            DropdownButton<DallEImageSize>(
+                              value: context
+                                  .appState.value.settings.dallEImageSize,
+                              onChanged: (value) async {
+                                if (value == null ||
+                                    value ==
+                                        context.appState.value.settings
+                                            .dallEImageSize) {
+                                  return;
+                                }
+
+                                context.appState.value.settings.dallEImageSize =
+                                    value;
+                                LocalData.instance.saveAppSettings(
+                                    context.appState.value.settings);
+                                setState(() {});
+                              },
+                              items: DallEImageSize.values.map((size) {
+                                return DropdownMenuItem(
+                                  value: size,
+                                  child: Text('${size.apiSize} (${size.cost})'),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),

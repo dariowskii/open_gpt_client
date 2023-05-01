@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:open_gpt_client/models/api_client.dart';
+import 'package:open_gpt_client/models/app_settings.dart';
 import 'package:open_gpt_client/models/chat.dart';
+import 'package:open_gpt_client/models/local_data.dart';
 
-/// 
+///
 class AppState {
   final List<Chat> chats;
-  String? selectedChatId;
+  AppSettings settings;
   Chat? get selectedChat {
+    final selectedChatId = settings.selectedChatId;
     if (selectedChatId != null) {
       return chats.firstWhere((e) => e.id == selectedChatId);
     }
@@ -14,51 +17,40 @@ class AppState {
     return null;
   }
 
+  bool isGenerating = false;
+
   AppState({
     required this.chats,
-    this.selectedChatId,
+    required this.settings,
   });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'chats': chats.map((e) => e.toJson()).toList(),
-      'selectedChatId': selectedChatId,
-    };
-  }
-
-  factory AppState.fromJson(Map<String, dynamic> json) {
-    return AppState(
-      chats: (json['chats'] as List<dynamic>)
-          .map((e) => Chat.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      selectedChatId: json['selectedChatId'] as String?,
-    );
-  }
 }
 
-/// The [AppStateNotifier] holds the state of the app and notifies 
+/// The [AppStateNotifier] holds the state of the app and notifies
 /// the listeners when the state changes.
 class AppStateNotifier extends ValueNotifier<AppState> {
   AppStateNotifier({required AppState state}) : super(state);
 
-  void addChat(Chat chat) {
-    value.chats.add(chat);
+  void refresh() {
     notifyListeners();
   }
 
-  void removeChat(Chat chat) {
-    value.chats.remove(chat);
+  void addAndSelectChat(Chat chat) {
+    value.chats.add(chat);
+    value.settings.selectedChatId = chat.id;
+    LocalData.instance.saveSelectedChatId(chat.id);
     notifyListeners();
   }
 
   void selectChat(Chat chat) {
-    value.selectedChatId = chat.id;
+    value.settings.selectedChatId = chat.id;
+    LocalData.instance.saveSelectedChatId(chat.id);
     notifyListeners();
   }
 
   void deleteChat(Chat chat) {
     value.chats.remove(chat);
-    value.selectedChatId = value.chats.isNotEmpty ? value.chats.first.id : null;
+    value.settings.selectedChatId = value.chats.isNotEmpty ? value.chats.first.id : null;
+    LocalData.instance.deleteChat(chat);
     notifyListeners();
   }
 
@@ -68,8 +60,9 @@ class AppStateNotifier extends ValueNotifier<AppState> {
   }
 
   void addToSelectedAndContext(ChatMessage message) {
-    value.selectedChat?.messages.add(message);
-    value.selectedChat?.contextMessages.add(message);
+    value.selectedChat!.messages.add(message);
+    value.selectedChat!.contextMessages.add(message);
+    LocalData.instance.saveChat(value.selectedChat!);
     notifyListeners();
   }
 
@@ -84,18 +77,22 @@ class AppStateNotifier extends ValueNotifier<AppState> {
   }
 
   void addMessageToContext(ChatMessage message) {
-    value.selectedChat?.contextMessages.add(message);
+    value.selectedChat!.contextMessages.add(message);
+    LocalData.instance.saveChat(value.selectedChat!);
     notifyListeners();
   }
 
   void removeMessageFromContext(ChatMessage message) {
     value.selectedChat?.contextMessages.remove(message);
+    LocalData.instance.saveChat(value.selectedChat!);
     notifyListeners();
   }
 
   void deleteMessage(ChatMessage message) {
-    value.selectedChat?.messages.remove(message);
-    value.selectedChat?.contextMessages.remove(message);
+    final selectedChat = value.selectedChat!;
+    selectedChat.messages.remove(message);
+    selectedChat.contextMessages.remove(message);
+    LocalData.instance.saveChat(selectedChat);
     notifyListeners();
   }
 
@@ -103,12 +100,14 @@ class AppStateNotifier extends ValueNotifier<AppState> {
     return value.selectedChat?.contextMessages.contains(message) ?? false;
   }
 
-  void editChatTitle(Chat chat, String newTitle) {
-    final index = value.chats.indexOf(chat);
-    final newChat = value.chats[index].copyWith(title: newTitle);
-    value.chats.removeAt(index);
-    value.chats.insert(index, newChat);
+  void setGenerating(bool isGenerating) {
+    value.isGenerating = isGenerating;
     notifyListeners();
+  }
+
+  void attachGeneratedImageToLastMessage(ChatImage image) {
+    value.selectedChat?.messages.last.uniqueKeyUI?.currentState
+        ?.attachGeneratedImage(image);
   }
 }
 

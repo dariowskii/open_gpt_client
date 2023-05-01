@@ -16,6 +16,7 @@ class WelcomeLockScreen extends StatefulWidget {
 
 class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
   late var _isPasswordVisible = false;
+  late var _isDecrypting = false;
   late final _textController = TextEditingController();
 
   @override
@@ -32,9 +33,17 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
       return;
     }
 
+    setState(() {
+      _isDecrypting = true;
+    });
+
     try {
       await LocalData.instance.setUserKey(password);
       final appState = await LocalData.instance.loadAppState();
+
+      setState(() {
+        _isDecrypting = false;
+      });
 
       if (!mounted) {
         return;
@@ -58,6 +67,10 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
       context.showSnackBar(errorMessage);
     } catch (error) {
       context.showSnackBar(error.toString());
+    } finally {
+      setState(() {
+        _isDecrypting = false;
+      });
     }
   }
 
@@ -165,6 +178,21 @@ class _WelcomeLockScreenState extends State<WelcomeLockScreen> {
                   ),
                 ),
               ),
+              if (_isDecrypting) ...[
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(),
+                    ),
+                    SizedBox(width: 16),
+                    Text('Sto decriptando...'),
+                  ],
+                )
+              ]
             ],
           ),
         ),

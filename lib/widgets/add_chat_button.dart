@@ -11,21 +11,20 @@ class AddChatButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = context.appState;
     final appLocals = context.appLocals;
-    
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ElevatedButton(
-        onPressed: () {
+        onPressed: () async {
           final chat = Chat(
             id: const Uuid().v4(),
             title: appLocals.noChatTitle,
             messages: [],
             contextMessages: [],
           );
-          appState.addChat(chat);
-          appState.selectChat(chat);
-          LocalData.instance.saveSelectedChatId(chat.id);
-          LocalData.instance.saveAppState(appState.value);
+          appState.addAndSelectChat(chat);
+          await LocalData.instance.saveChat(chat);
+          await LocalData.instance.saveAppSettings(appState.value.settings);
         },
         child: Row(
           mainAxisSize: MainAxisSize.min,

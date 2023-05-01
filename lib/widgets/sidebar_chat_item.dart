@@ -46,8 +46,9 @@ class SidebarChatItem extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                appState.editChatTitle(chat, textController.text);
-                LocalData.instance.saveAppState(appState.value);
+                chat.title = textController.text;
+                appState.refresh();
+                LocalData.instance.saveChat(chat);
                 context.pop();
               },
               child: Text(appLocals.save),
@@ -76,7 +77,6 @@ class SidebarChatItem extends StatelessWidget {
             TextButton(
               onPressed: () {
                 appState.deleteChat(chat);
-                LocalData.instance.saveAppState(appState.value);
                 context.pop();
               },
               child: Text(
@@ -94,7 +94,6 @@ class SidebarChatItem extends StatelessWidget {
 
   void _selectChat(AppStateNotifier appState) {
     appState.selectChat(chat);
-    LocalData.instance.saveSelectedChatId(chat.id);
   }
 
   @override
@@ -117,7 +116,8 @@ class SidebarChatItem extends StatelessWidget {
           IconButton(
             padding: EdgeInsets.zero,
             iconSize: 18,
-            icon: Icon(Icons.delete, color: Colors.red[300]),
+            icon:
+                Icon(Icons.delete, color: isSelected ? Colors.red[300] : null),
             onPressed: () => _deleteChat(context, appState, appLocals),
           ),
         ],

@@ -1,14 +1,19 @@
-import 'dart:convert';
+import 'dart:io';
+
 import 'package:encrypt/encrypt.dart';
+import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:open_gpt_client/models/app_settings.dart';
+import 'package:open_gpt_client/models/chat.dart';
 import 'package:open_gpt_client/utils/app_bloc.dart';
 import 'package:open_gpt_client/utils/constants.dart';
 import 'package:open_gpt_client/utils/exceptions.dart';
+import 'package:open_gpt_client/utils/utils.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// The [LocalData] class defines the local data of the app.
 class LocalData {
-
   /// The [_iv] property defines the initialization vector of the encryption.
   IV? _iv;
 
@@ -21,12 +26,18 @@ class LocalData {
   /// The [instance] getter defines the instance of the singleton.
   static LocalData get instance => _instance;
 
-  /// Priate accessor to the SharedPreferences instance.
+  /// Private accessor to the SharedPreferences instance.
   late final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   LocalData._() {
     dotenv.load();
   }
+
+  Future<Directory> get _documentsPath async {
+    return await getApplicationDocumentsDirectory();
+  }
+
+  AppSettings appSettings = AppSettings();
 
   /// The [setupDone] getter defines if the setup of the app is done.
   Future<bool?> get setupDone async {
@@ -35,29 +46,18 @@ class LocalData {
   }
 
   /// The [hasAPIKey] getter defines if the user has setted the API key.
-  Future<bool> get hasAPIKey async {
-    final prefs = await _prefs;
-    final apiKey = prefs.getString(Constants.keys.apiKey);
-    return apiKey != null && apiKey.isNotEmpty;
+  bool get hasAPIKey {
+    return appSettings.apiKey != null && appSettings.apiKey!.isNotEmpty;
   }
 
   /// The [apiKey] getter defines the API key of the user.
-  Future<String?> get apiKey async {
-    assert(
-      _iv != null && _encrypter != null,
-      Constants.internalErrors.keyNotSetted,
-    );
-
-    final prefs = await _prefs;
-    return _encrypter!.decrypt64(
-      prefs.getString(Constants.keys.apiKey)!,
-      iv: _iv!,
-    );
+  String? get apiKey {
+    return appSettings.apiKey;
   }
 
   /// The [reducedApiKey] getter defines the reduced API key of the user.
   Future<String?> get reducedApiKey async {
-    final key = await apiKey;
+    final key = apiKey;
     if (key == null) {
       return null;
     }
@@ -84,7 +84,7 @@ class LocalData {
   /// If the encryption test phrase is not setted, it means that the app is
   /// being setup for the first time, so the encryption test phrase is setted
   /// and saved.
-  /// 
+  ///
   /// This function throws exceptions:
   /// - [KeyException] of type [KeyExceptionType.wrongKeyLength] if the key is not 16, 24 or 32 bytes long.
   /// - [KeyException] of type [KeyExceptionType.wrongKey] if the key is wrong.
@@ -92,15 +92,17 @@ class LocalData {
     final encrypter = _generateEncrypter(key);
     final iv = _generateIV();
 
-    final prefs = await _prefs;
-    final memoryPhrase = prefs.getString(Constants.keys.encryptedTestPhrase);
-    final encryptedPhrase =
-        encrypter.encrypt('never gonna give you up', iv: iv);
+    final args = {
+      'encrypter': encrypter,
+      'iv': iv,
+      'documentsPath': await _documentsPath,
+    };
+
+    final memoryPhrase = await compute(concurrentGetEncryptTestPhrase, args);
 
     if (memoryPhrase == null) {
       // first setup
-      await prefs.setString(
-          Constants.keys.encryptedTestPhrase, encryptedPhrase.base64);
+      await compute(concurrentSetEncryptTestPhrase, args);
 
       _iv = iv;
       _encrypter = encrypter;
@@ -108,7 +110,7 @@ class LocalData {
       return;
     }
 
-    if (encryptedPhrase.base64 != memoryPhrase) {
+    if (Constants.keys.testPhrase != memoryPhrase) {
       throw const KeyException(type: KeyExceptionType.wrongKey);
     }
 
@@ -118,43 +120,92 @@ class LocalData {
 
   /// The [setAPIKey] method sets the API key of the user.
   Future<void> setAPIKey(String apiKey) async {
-    assert(
-      _iv != null && _encrypter != null,
-      Constants.internalErrors.keyNotSetted,
-    );
+    appSettings.apiKey = apiKey;
 
-    final prefs = await _prefs;
-    await prefs.setString(
-      Constants.keys.apiKey,
-      _encrypter!.encrypt(apiKey, iv: _iv!).base64,
-    );
+    await saveAppSettings(appSettings);
   }
 
   /// The [setSelectedChatId] method saves the current selected chat id by the user.
   Future<void> saveSelectedChatId(String chatId) async {
-    assert(
-      _iv != null && _encrypter != null,
-      Constants.internalErrors.keyNotSetted,
-    );
+    appSettings.selectedChatId = chatId;
 
-    final prefs = await _prefs;
-    await prefs.setString(
-      Constants.keys.selectedChatId,
-      _encrypter!.encrypt(chatId, iv: _iv!).base64,
-    );
+    await saveAppSettings(appSettings);
   }
 
-  /// The [saveAppState] method saves the current state of the app.
-  Future<void> saveAppState(AppState state) async {
+  Future<void> saveChat(Chat chat) async {
     assert(
       _iv != null && _encrypter != null,
       Constants.internalErrors.keyNotSetted,
     );
 
-    final prefs = await _prefs;
-    final json = jsonEncode(state);
-    await prefs.setString(
-        Constants.keys.appState, _encrypter!.encrypt(json, iv: _iv!).base64);
+    final args = {
+      'encrypter': _encrypter,
+      'iv': _iv,
+      'chat': chat,
+      'documentsPath': await _documentsPath,
+    };
+
+    await compute(concurrentSaveChat, args);
+  }
+
+  Future<void> deleteChat(Chat chat) async {
+    assert(
+      _iv != null && _encrypter != null,
+      Constants.internalErrors.keyNotSetted,
+    );
+
+    final args = {
+      'chat': chat,
+      'documentsPath': await _documentsPath,
+    };
+
+    await compute(concurrentDeleteChat, args);
+  }
+
+  Future<void> saveChatImage(ChatImage chatImage) async {
+    assert(
+      _iv != null && _encrypter != null,
+      Constants.internalErrors.keyNotSetted,
+    );
+
+    final args = {
+      'encrypter': _encrypter,
+      'iv': _iv,
+      'image': chatImage,
+      'documentsPath': await _documentsPath,
+    };
+
+    await compute(concurrentSaveImage, args);
+  }
+
+  Future<void> deleteChatImage(ChatImage chatImage) async {
+    assert(
+      _iv != null && _encrypter != null,
+      Constants.internalErrors.keyNotSetted,
+    );
+
+    final args = {
+      'image': chatImage,
+      'documentsPath': await _documentsPath,
+    };
+
+    await compute(concurrentDeleteImage, args);
+  }
+
+  Future<void> saveAppSettings(AppSettings settings) async {
+    assert(
+      _iv != null && _encrypter != null,
+      Constants.internalErrors.keyNotSetted,
+    );
+
+    final args = {
+      'encrypter': _encrypter,
+      'iv': _iv,
+      'appSettings': settings,
+      'documentsPath': await _documentsPath,
+    };
+
+    await compute(concurrentSaveAppSettings, args);
   }
 
   /// The [loadAppState] method loads the saved state of the app.
@@ -164,19 +215,14 @@ class LocalData {
       Constants.internalErrors.keyNotSetted,
     );
 
-    final prefs = await _prefs;
-    final json = prefs.getString(Constants.keys.appState);
-    if (json != null) {
-      final decrypted = _encrypter!.decrypt64(json, iv: _iv!);
-      final state = AppState.fromJson(jsonDecode(decrypted));
-      final selectedChatId = prefs.getString(Constants.keys.selectedChatId);
-      if (selectedChatId != null) {
-        state.selectedChatId = _encrypter!.decrypt64(selectedChatId, iv: _iv!);
-      }
-      return state;
-    }
-
-    return AppState(chats: []);
+    final args = {
+      'encrypter': _encrypter,
+      'iv': _iv,
+      'documentsPath': await _documentsPath,
+    };
+    final appState = await compute(buildAppState, args);
+    appSettings = appState.settings;
+    return appState;
   }
 
   /// The [reset] method resets the local storage.
@@ -186,13 +232,53 @@ class LocalData {
 
     final prefs = await _prefs;
     await prefs.clear();
+
+    await compute(concurrentDeleteAllData, await _documentsPath);
+  }
+
+  Future<void> migrateFromPrefsToConcurrentIfNecessary() async {
+    assert(
+      _iv != null && _encrypter != null,
+      Constants.internalErrors.keyNotSetted,
+    );
+
+    final prefs = await _prefs;
+    final needMigration = prefs.getBool(Constants.keys.needMigration) ?? true;
+    final setupDone = prefs.getBool(Constants.keys.setupDone) ?? false;
+    if (!needMigration || !setupDone) {
+      return;
+    }
+
+    final appState = prefs.getString(Constants.keys.appState);
+    if (appState == null || appState.isEmpty) {
+      return;
+    }
+
+    final apiKey = prefs.getString(Constants.keys.apiKey);
+    final selectedChatId = prefs.getString(Constants.keys.selectedChatId);
+
+    await prefs.clear();
+
+    await prefs.setBool(Constants.keys.needMigration, false);
+    await prefs.setBool(Constants.keys.setupDone, true);
+
+    final args = {
+      'encrypter': _encrypter,
+      'iv': _iv,
+      'appState': appState,
+      'apiKey': apiKey,
+      'selectedChatId': selectedChatId,
+      'documentsPath': await _documentsPath,
+    };
+
+    await compute(concurrentMigrateFromPrefs, args);
   }
 
   /// Generates a random IV.
   IV _generateIV() => IV.fromLength(16);
 
   /// Generates an encrypter from the given [key].
-  /// 
+  ///
   /// This function throws a [KeyException] of type [KeyExceptionType.wrongKeyLength]
   /// if the key is not 16, 24 or 32 bytes long.
   Encrypter _generateEncrypter(String key) {

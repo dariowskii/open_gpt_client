@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:open_gpt_client/models/api_client.dart';
+import 'package:open_gpt_client/models/app_settings.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:open_gpt_client/screens/on_boarding_screen.dart';
@@ -31,7 +32,10 @@ void main() async {
   runApp(
     AppBloc(
       appState: AppStateNotifier(
-        state: AppState(chats: []),
+        state: AppState(
+          chats: [],
+          settings: AppSettings(),
+        ),
       ),
       apiService: ApiClient(),
       child: MyApp(home: home),

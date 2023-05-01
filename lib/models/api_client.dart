@@ -3,15 +3,19 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:open_gpt_client/models/app_settings.dart';
 import 'package:open_gpt_client/models/chat.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_gpt_client/utils/utils.dart';
 
 /// The [ApiService] interface defines the contract for the [ApiClient].
 abstract class ApiService {
-
   /// The [sendMessages] method sends the messages of the selected [chat] to the OpenAI API.
   Future<Stream<String>?> sendMessages(Chat chat);
+
+  /// The [createImage] method creates an image from the [text] with the [size].
+  Future<ChatImage?> createImage(String text, DallEImageSize size);
 
   /// The [checkUpdate] method checks if there is an update of the app.
   Future<bool?> checkUpdate();
@@ -27,7 +31,7 @@ class ApiClient implements ApiService {
           .postUrl(Uri.parse('https://api.openai.com/v1/chat/completions'));
       request.headers.set('content-type', 'application/json;charset=UTF-8');
       request.headers
-          .set('Authorization', 'Bearer ${(await LocalData.instance.apiKey)!}');
+          .set('Authorization', 'Bearer ${LocalData.instance.apiKey}');
       final messages = chat.contextMessagesJson();
       request.add(
         utf8.encode(
@@ -67,6 +71,41 @@ class ApiClient implements ApiService {
 
       httpClient.close();
       return stream;
+    } catch (e) {
+      debugPrint(e.toString());
+      return null;
+    }
+  }
+
+  @override
+  Future<ChatImage?> createImage(String text, DallEImageSize size) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://api.openai.com/v1/images/generations'),
+        headers: {
+          'Authorization': 'Bearer ${LocalData.instance.apiKey}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'prompt': text,
+          'response_format': 'b64_json',
+          'size': size.apiSize,
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        return null;
+      }
+
+      final json = await compute(parseJson, response.body);
+      final base64Json = json['data'][0]['b64_json'];
+      final args = {
+        'prompt': text,
+        'data': base64Json,
+        'size': size,
+      };
+      final image = await compute(getChatImageFromBase64, args);
+      return image;
     } catch (e) {
       debugPrint(e.toString());
       return null;
