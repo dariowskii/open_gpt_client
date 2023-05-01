@@ -3,11 +3,13 @@ import 'package:open_gpt_client/extensions/context_extension.dart';
 import 'package:open_gpt_client/models/api_client.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:open_gpt_client/screens/desktop/sidebar_home.dart';
+import 'package:open_gpt_client/utils/constants.dart';
 import 'package:open_gpt_client/widgets/ask_api_key_alert_dialog.dart';
 import 'package:open_gpt_client/widgets/check_update_button.dart';
 import 'package:open_gpt_client/widgets/selected_chat_action_field.dart';
 import 'package:open_gpt_client/widgets/selected_chat_body.dart';
 import 'package:open_gpt_client/widgets/selected_chat_header.dart';
+import 'package:open_gpt_client/widgets/version_news_dialog.dart';
 
 /// The home screen for desktop.
 class DesktopHomeScreen extends StatefulWidget {
@@ -38,7 +40,7 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
           content: Row(
             children: const [
               CircularProgressIndicator(),
-              SizedBox(width: 8),
+              SizedBox(width: 16),
               Text('Sto inizializzando...'),
             ],
           ),
@@ -56,6 +58,21 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
       return;
     }
     context.pop();
+
+    final currentVersionNews = await LocalData.instance.versionNews;
+
+    if (currentVersionNews == null ||
+        currentVersionNews != Constants.appVersion) {
+      await LocalData.instance.setVersionNews(Constants.appVersion);
+      if (!mounted) {
+        return;
+      }
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const VersionNewsDialog(),
+      );
+    }
 
     if (!LocalData.instance.hasAPIKey) {
       askApiKey();

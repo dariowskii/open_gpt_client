@@ -7,6 +7,7 @@ import 'package:open_gpt_client/models/app_settings.dart';
 import 'package:open_gpt_client/models/chat.dart';
 import 'package:open_gpt_client/models/local_data.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_gpt_client/utils/constants.dart';
 import 'package:open_gpt_client/utils/utils.dart';
 
 /// The [ApiService] interface defines the contract for the [ApiClient].
@@ -132,8 +133,8 @@ class ApiClient implements ApiService {
 
       final json = jsonDecode(response.body);
       final version = (json['tag_name'] as String).replaceFirst('v', '');
-      // TODO: Change this to the current version of the app.
-      return version != '0.0.1';
+      
+      return version != Constants.appVersion;
     } catch (e) {
       debugPrint(e.toString());
       return false;

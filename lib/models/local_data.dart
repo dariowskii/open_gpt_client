@@ -39,6 +39,11 @@ class LocalData {
 
   AppSettings appSettings = AppSettings();
 
+  Future<String?> get versionNews async {
+    final prefs = await _prefs;
+    return prefs.getString(Constants.keys.versionNews);
+  }
+
   /// The [setupDone] getter defines if the setup of the app is done.
   Future<bool?> get setupDone async {
     final prefs = await _prefs;
@@ -72,6 +77,11 @@ class LocalData {
   /// The [ghKey] getter defines the GitHub key used to check for updates.
   String? get ghKey {
     return dotenv.env[Constants.keys.ghKey];
+  }
+
+  Future<void> setVersionNews(String versionNews) async {
+    final prefs = await _prefs;
+    await prefs.setString(Constants.keys.versionNews, versionNews);
   }
 
   /// The [setSetupDone] method sets the setup of the app as done.

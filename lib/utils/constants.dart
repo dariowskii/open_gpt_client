@@ -2,6 +2,9 @@
 class Constants {
   static Keys keys = const Keys();
   static InternalErrors internalErrors = const InternalErrors();
+
+  // TODO: Change this to the current version of the app.
+  static const appVersion = '0.1.0';
 }
 
 /// The [Keys] class holds the keys used in the app.
@@ -18,6 +21,7 @@ class Keys {
   String get appState => 'appState';
   String get chats => 'chats';
   String get images => 'images';
+  String get versionNews => 'versionNews';
 }
 
 /// The [InternalErrors] class holds the internal errors strings.
