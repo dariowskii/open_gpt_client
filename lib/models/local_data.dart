@@ -92,6 +92,14 @@ class LocalData {
     final encrypter = _generateEncrypter(key);
     final iv = _generateIV();
 
+    final prefs = await _prefs;
+    final encryptedTestPhrase =
+        prefs.getString(Constants.keys.encryptedTestPhrase);
+    if (encryptedTestPhrase != null) {
+      await oldSetUserKey(key, encryptedTestPhrase, encrypter, iv);
+      return;
+    }
+
     final args = {
       'encrypter': encrypter,
       'iv': iv,
@@ -111,6 +119,19 @@ class LocalData {
     }
 
     if (Constants.keys.testPhrase != memoryPhrase) {
+      throw const KeyException(type: KeyExceptionType.wrongKey);
+    }
+
+    _iv = iv;
+    _encrypter = encrypter;
+  }
+
+  Future<void> oldSetUserKey(String key, String encryptedTestPhrase,
+      Encrypter encrypter, IV iv) async {
+    final decryptedTestPhrase =
+        encrypter.decrypt64(encryptedTestPhrase, iv: iv);
+
+    if (Constants.keys.testPhrase != decryptedTestPhrase) {
       throw const KeyException(type: KeyExceptionType.wrongKey);
     }
 
