@@ -49,7 +49,8 @@ class AppStateNotifier extends ValueNotifier<AppState> {
 
   void deleteChat(Chat chat) {
     value.chats.remove(chat);
-    value.settings.selectedChatId = value.chats.isNotEmpty ? value.chats.first.id : null;
+    value.settings.selectedChatId =
+        value.chats.isNotEmpty ? value.chats.first.id : null;
     LocalData.instance.deleteChat(chat);
     if (value.settings.selectedChatId != null) {
       LocalData.instance.saveSelectedChatId(value.settings.selectedChatId!);

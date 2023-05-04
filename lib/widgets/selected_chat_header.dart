@@ -8,7 +8,7 @@ class SelectedChatHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = context.appState;
     final appLocals = context.appLocals;
-    
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(

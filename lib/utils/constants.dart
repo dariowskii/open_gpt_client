@@ -5,6 +5,7 @@ class Constants {
 
   // TODO: Change this to the current version of the app.
   static const appVersion = '0.1.0';
+  static const directoryPath = 'open_gpt_client';
 }
 
 /// The [Keys] class holds the keys used in the app.

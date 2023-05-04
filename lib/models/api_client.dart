@@ -133,7 +133,7 @@ class ApiClient implements ApiService {
 
       final json = jsonDecode(response.body);
       final version = (json['tag_name'] as String).replaceFirst('v', '');
-      
+
       return version != Constants.appVersion;
     } catch (e) {
       debugPrint(e.toString());

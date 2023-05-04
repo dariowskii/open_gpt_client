@@ -172,9 +172,8 @@ class ChatImage {
         (e) => describeEnum(e) == json['size'],
         orElse: () => DallEImageSize.large,
       ),
-      imageBytes: json['imageBytes'] != null
-          ? base64Decode(json['imageBytes'])
-          : null,
+      imageBytes:
+          json['imageBytes'] != null ? base64Decode(json['imageBytes']) : null,
       imageSize: json['imageSize'],
       chatMessageId: json['chatMessageId'],
     );

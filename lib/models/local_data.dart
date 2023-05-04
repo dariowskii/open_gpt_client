@@ -34,7 +34,8 @@ class LocalData {
   }
 
   Future<Directory> get _documentsPath async {
-    return await getApplicationDocumentsDirectory();
+    final defaultDir = await getApplicationDocumentsDirectory();
+    return Directory('${defaultDir.path}/${Constants.directoryPath}');
   }
 
   AppSettings appSettings = AppSettings();

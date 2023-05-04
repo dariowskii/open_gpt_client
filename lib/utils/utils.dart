@@ -212,8 +212,11 @@ Future<void> concurrentMigrateFromPrefs(Map<String, dynamic> args) async {
   final selectedChatId = args['selectedChatId'] as String?;
 
   final appStateJson = jsonDecode(encrypter.decrypt64(appState, iv: iv));
-  final apiKeyDecripted = apiKey == null ? null : encrypter.decrypt64(apiKey, iv: iv);
-  final selectedChatIdDecrypted = selectedChatId == null ? null : encrypter.decrypt64(selectedChatId, iv: iv);
+  final apiKeyDecripted =
+      apiKey == null ? null : encrypter.decrypt64(apiKey, iv: iv);
+  final selectedChatIdDecrypted = selectedChatId == null
+      ? null
+      : encrypter.decrypt64(selectedChatId, iv: iv);
 
   final appSettings = AppSettings(
     apiKey: apiKeyDecripted,

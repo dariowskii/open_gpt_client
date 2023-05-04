@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:open_gpt_client/utils/constants.dart';
 import 'package:open_gpt_client/widgets/support_me_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -35,40 +36,41 @@ class InfoScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               const Text.rich(
-                TextSpan(text: 'Open GPT Client è un software ', children: [
-                  TextSpan(
-                    text: 'open source',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                TextSpan(
+                  text: 'Open GPT Client è un software ',
+                  children: [
+                    TextSpan(
+                      text: 'open source',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  TextSpan(
-                    text:
-                        ' che ti permette di interagire con le API di OpenAI (in particolare con ',
-                  ),
-                  TextSpan(
-                    text: 'ChatGPT 3.5',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                    TextSpan(
+                      text: ' che ti permette di interagire con le API di OpenAI (in particolare con ',
                     ),
-                  ),
-                  TextSpan(
-                    text: ') in maniera semplice e gratuita ',
-                  ),
-                  TextSpan(
-                    text: 'senza raccogliere dati personali.',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                    TextSpan(
+                      text: 'ChatGPT 3.5',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ]),
+                    TextSpan(
+                      text: ') in maniera semplice e gratuita ',
+                    ),
+                    TextSpan(
+                      text: 'senza raccogliere dati personali.',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
               const Text.rich(
                 TextSpan(
-                  text:
-                      'Tutti i dati salvati in locale sono criptati con algoritmo ',
+                  text: 'Tutti i dati salvati in locale sono criptati con algoritmo ',
                   children: [
                     TextSpan(
                       text: 'AES-256',
@@ -86,39 +88,39 @@ class InfoScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Text.rich(
                 TextSpan(
-                    text: 'Il codice sorgente è disponibile su ',
-                    children: [
-                      TextSpan(
-                        text: 'GitHub',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                        ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = _openGithubRepo,
+                  text: 'Il codice sorgente è disponibile su ',
+                  children: [
+                    TextSpan(
+                      text: 'GitHub',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
                       ),
-                      const TextSpan(
-                        text: ' e puoi contribuire al progetto ',
+                      recognizer: TapGestureRecognizer()..onTap = _openGithubRepo,
+                    ),
+                    const TextSpan(
+                      text: ' e puoi contribuire al progetto ',
+                    ),
+                    const TextSpan(
+                      text: 'apportando modifiche',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
-                      const TextSpan(
-                        text: 'apportando modifiche',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                    const TextSpan(
+                      text: ' o ',
+                    ),
+                    const TextSpan(
+                      text: 'segnalando bug',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
-                      const TextSpan(
-                        text: ' o ',
-                      ),
-                      const TextSpan(
-                        text: 'segnalando bug',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const TextSpan(
-                        text: '.',
-                      ),
-                    ]),
+                    ),
+                    const TextSpan(
+                      text: '.',
+                    ),
+                  ],
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
@@ -131,6 +133,8 @@ class InfoScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               const SupportMeCard(),
+              const SizedBox(height: 16),
+              const Text('version: ${Constants.appVersion}')
             ],
           ),
         ),
