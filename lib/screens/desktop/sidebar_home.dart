@@ -53,19 +53,28 @@ class SidebarHome extends StatelessWidget {
             );
           },
         ),
-        const AddChatButton(),
-        ListTile(
-          leading: const Icon(Icons.settings),
-          title: Text(appLocals.settings),
-          onTap: () {
-            context.push(const SettingsScreen());
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.info),
-          title: Text(appLocals.about),
-          onTap: () {
-            context.push(const InfoScreen());
+        ValueListenableBuilder(
+          valueListenable: appState,
+          builder: (context, state, _) {
+            return Column(
+              children: [
+                const AddChatButton(),
+                ListTile(
+                  leading: const Icon(Icons.settings),
+                  title: Text(appLocals.settings),
+                  onTap: state.isGenerating ? null : () {
+                    context.push(const SettingsScreen());
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.info),
+                  title: Text(appLocals.about),
+                  onTap: state.isGenerating ? null : () {
+                    context.push(const InfoScreen());
+                  },
+                ),
+              ],
+            );
           },
         ),
       ],

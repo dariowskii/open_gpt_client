@@ -101,36 +101,44 @@ class SidebarChatItem extends StatelessWidget {
     final appLocals = context.appLocals;
     final appState = context.appState;
 
-    return ListTile(
-      mouseCursor: SystemMouseCursors.click,
-      selected: isSelected,
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            iconSize: 18,
-            padding: EdgeInsets.zero,
-            icon: const Icon(Icons.edit),
-            onPressed: () => _editTitle(context, appState, appLocals),
-          ),
-          IconButton(
-            padding: EdgeInsets.zero,
-            iconSize: 18,
-            icon:
-                Icon(Icons.delete, color: isSelected ? Colors.red[300] : null),
-            onPressed: () => _deleteChat(context, appState, appLocals),
-          ),
-        ],
-      ),
-      title: Text(
-        chat.title,
-        style: TextStyle(
-          fontWeight: isSelected ? FontWeight.bold : null,
-          fontSize: 14,
-        ),
-        overflow: TextOverflow.ellipsis,
-      ),
-      onTap: () => _selectChat(appState),
-    );
+    return ValueListenableBuilder(
+        valueListenable: appState,
+        builder: (context, state, _) {
+          return ListTile(
+            mouseCursor: SystemMouseCursors.click,
+            selected: isSelected,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  iconSize: 18,
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(Icons.edit),
+                  onPressed: state.isGenerating
+                      ? null
+                      : () => _editTitle(context, appState, appLocals),
+                ),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  iconSize: 18,
+                  icon: Icon(Icons.delete,
+                      color: isSelected ? Colors.red[300] : null),
+                  onPressed: state.isGenerating
+                      ? null
+                      : () => _deleteChat(context, appState, appLocals),
+                ),
+              ],
+            ),
+            title: Text(
+              chat.title,
+              style: TextStyle(
+                fontWeight: isSelected ? FontWeight.bold : null,
+                fontSize: 14,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+            onTap: state.isGenerating ? null : () => _selectChat(appState),
+          );
+        });
   }
 }

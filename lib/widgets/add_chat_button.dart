@@ -12,29 +12,36 @@ class AddChatButton extends StatelessWidget {
     final appState = context.appState;
     final appLocals = context.appLocals;
 
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ElevatedButton(
-        onPressed: () async {
-          final chat = Chat(
-            id: const Uuid().v4(),
-            title: appLocals.noChatTitle,
-            messages: [],
-            contextMessages: [],
+    return ValueListenableBuilder(
+        valueListenable: appState,
+        builder: (context, state, _) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: state.isGenerating
+                  ? null
+                  : () async {
+                      final chat = Chat(
+                        id: const Uuid().v4(),
+                        title: appLocals.noChatTitle,
+                        messages: [],
+                        contextMessages: [],
+                      );
+                      appState.addAndSelectChat(chat);
+                      await LocalData.instance.saveChat(chat);
+                      await LocalData.instance
+                          .saveAppSettings(appState.value.settings);
+                    },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.add),
+                  const SizedBox(width: 8),
+                  Text(appLocals.addChat),
+                ],
+              ),
+            ),
           );
-          appState.addAndSelectChat(chat);
-          await LocalData.instance.saveChat(chat);
-          await LocalData.instance.saveAppSettings(appState.value.settings);
-        },
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.add),
-            const SizedBox(width: 8),
-            Text(appLocals.addChat),
-          ],
-        ),
-      ),
-    );
+        });
   }
 }
