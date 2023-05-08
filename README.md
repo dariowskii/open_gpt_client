@@ -1,6 +1,16 @@
 # Open GPT Client
 
-Questo è un client open source per poter utilizzare le API di **OpenAI**, in primis con il modello **GPT-3.5** per usare la chat.
+Questo è un client open source per poter utilizzare le API di **OpenAI**, in primis con il modello **GPT-3.5** per usare la chat e **DALL-E** per generare immagini.
+
+## Screenshots
+
+Utilizzo chat:
+
+![Chat](.github_assets/chat.gif)
+
+Generazione immagini:
+
+![Image](.github_assets/image.png)
 
 ## Come funziona
 

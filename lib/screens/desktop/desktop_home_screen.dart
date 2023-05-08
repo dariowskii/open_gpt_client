@@ -104,9 +104,9 @@ class _DesktopHomeScreenState extends State<DesktopHomeScreen> {
         centerTitle: true,
         elevation: 5,
         actions: [
-          if (_updateAvailable) ...[
-            const CheckUpdateButton(),
-          ]
+          // if (_updateAvailable) ...[
+          //   const CheckUpdateButton(),
+          // ]
         ],
       ),
       body: Row(
